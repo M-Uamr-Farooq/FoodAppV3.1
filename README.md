@@ -1,6 +1,5 @@
 ﻿# FoodAppV3.1
  <h3> Team Members  </h3>
- <br>
  <h5><ul> <li>M.Umar Farooq</li>
  <li>Junaid Mukhtar  </li>
  <li>Zohaib Hassan </li></ul>
