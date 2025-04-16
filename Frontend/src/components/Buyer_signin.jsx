@@ -41,7 +41,7 @@ const Buyer_signin = () => {
           <button type="submit" className="btn btn-primary w-100">Login</button>
         </form>
         <p className="text-center mt-3">
-          Don't have an account? <a href="/Buyer_signup" className="text-decoration-none">Sign up</a>
+          Don't have an account? <a href="/buyer-signup" className="text-decoration-none">Sign up</a>
         </p>
       </div>
     </div>
