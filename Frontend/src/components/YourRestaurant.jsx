@@ -9,6 +9,7 @@ const YourRestaurant = () => {
   const [restaurantImageUrl, setRestaurantImageUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageUrlInput, setImageUrlInput] = useState('');
 
   const navigate = useNavigate();
   const restaurantName = sessionStorage.getItem('restaurantName');
@@ -37,22 +38,26 @@ const YourRestaurant = () => {
     fetchData();
   }, [restaurantName, navigate]);
 
-  const handleImageUpdate = async (e) => {
-    e.preventDefault();
-    if (!restaurantImageUrl.trim()) return alert('Enter a valid image URL');
-
+  const handleImageUrlUpdate = async () => {
+    if (!imageUrlInput) {
+      alert('Please paste an image URL.');
+      return;
+    }
     try {
-      const res = await axios.put(`http://localhost:3000/api/restaurants/update-image`, {
-        restaurantName,
-        imageUrl: restaurantImageUrl
+      const res = await fetch(`http://localhost:3000/api/restaurants/${restaurantName}/image`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageUrlInput }),
       });
-
-      if (res.data.success) {
-        setRestaurant(prev => ({ ...prev, image: restaurantImageUrl }));
-        alert('Image URL updated');
+      const data = await res.json();
+      if (res.ok) {
+        alert('Image updated successfully!');
+        setRestaurant((prev) => ({ ...prev, image: imageUrlInput }));
+        setImageUrlInput('');
+      } else {
+        alert(data.message || 'Failed to update image');
       }
     } catch (err) {
-      console.error(err);
       alert('Failed to update image');
     }
   };
@@ -106,16 +111,18 @@ const YourRestaurant = () => {
                 className="img-fluid rounded mb-3"
                 style={{ maxHeight: '250px', objectFit: 'cover', borderRadius: '12px' }}
               />
-              <form onSubmit={handleImageUpdate}>
+              <div className="input-group mb-2">
                 <input
                   type="text"
-                  className="form-control mb-2"
-                  placeholder="Paste image URL"
-                  value={restaurantImageUrl}
-                  onChange={(e) => setRestaurantImageUrl(e.target.value)}
+                  className="form-control"
+                  placeholder="Paste image URL here"
+                  value={imageUrlInput}
+                  onChange={e => setImageUrlInput(e.target.value)}
                 />
-                <button type="submit" className="btn btn-warning w-100">Update Image</button>
-              </form>
+                <button className="btn btn-warning" type="button" onClick={handleImageUrlUpdate}>
+                  Update Image
+                </button>
+              </div>
               <p className="mt-3 text-muted">{restaurant.description}</p>
             </div>
           </div>
