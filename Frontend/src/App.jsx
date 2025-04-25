@@ -7,11 +7,13 @@ import Home from "./components/Home";
 import Buyer_signin from "./components/Buyer_signin";
 import Buyer_signup from "./components/Buyer_signup";
 import RegisterRestaurant from "./components/RegisterRestaurant";
+import VerifyOtp from "./components/VerifyOtp";
 import YourRestaurantAuth from "./components/YourRestaurantAuth";
 import YourRestaurant from "./components/YourRestaurant";
 import Cart from "./components/Cart";
 import Order from "./components/Order";
 import Ordered from "./components/Ordered";
+
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
           <Route path="/buyer-signin" element={<Buyer_signin />} />
           <Route path="/buyer-signup" element={<Buyer_signup />} />
           <Route path="/register-restaurant" element={<RegisterRestaurant />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/your-restaurant-auth" element={<YourRestaurantAuth />} />
           <Route path="/your-restaurant" element={<YourRestaurant />} />
           <Route path="/cart" element={<Cart />} />

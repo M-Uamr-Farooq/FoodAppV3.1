@@ -7,12 +7,9 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Increase payload size limit for body-parser
-app.use(bodyParser.json({ limit: '10mb' })); // Allow up to 10MB for JSON payloads
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // Allow up to 10MB for URL-encoded payloads
-
-// Database connection
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -22,10 +19,9 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) throw err;
-    console.log('Connected to the database!');
+    console.log('✅ Connected to MySQL');
 });
 
-// Create restaurants table
 const restaurantTable = `
 CREATE TABLE IF NOT EXISTS restaurants (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,119 +33,149 @@ CREATE TABLE IF NOT EXISTS restaurants (
 )`;
 db.query(restaurantTable, (err) => {
     if (err) throw err;
-    console.log('restaurants Table created!');
+    console.log('✅ Restaurant table ready');
 });
 
-// Configure Nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'shanisipra428@gmail.com', // Replace with your email
-        pass: 'oaqf rwba qrkj isxb', // Replace with your email password or app password
+        user: 'shanisipra428@gmail.com',
+        pass: 'oaqf rwba qrkj isxb',
     },
 });
 
-const otpStore = {}; // Temporary in-memory store for OTPs
+const otpStore = {};
 
-// Send OTP
 app.post('/api/send-otp', (req, res) => {
     const { email } = req.body;
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
-    otpStore[email] = otp;
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiry = Date.now() + 60 * 1000;
+    otpStore[email.trim()] = { otp, expiry };
 
-    const mailOptions = {
-        from: 'your-email@gmail.com',
+    transporter.sendMail({
+        from: 'shanisipra428@gmail.com',
         to: email,
         subject: 'Your OTP for Restaurant Registration',
-        text: `Your OTP is ${otp}. It is valid for 10 minutes.`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error sending OTP:', error);
-            return res.status(500).json({ message: 'Failed to send OTP. Please try again.' });
-        }
+        text: `Your OTP is ${otp}. It is valid for 1 minute.`,
+    }, (error) => {
+        if (error) return res.status(500).json({ message: 'Failed to send OTP.' });
         res.status(200).json({ message: 'OTP sent successfully!' });
     });
 });
 
-// Verify OTP
 app.post('/api/verify-otp', (req, res) => {
-    const { email, otp } = req.body;
-    if (otpStore[email] && otpStore[email] === parseInt(otp)) {
-        delete otpStore[email]; // Remove OTP after successful verification
-        res.status(200).json({ message: 'OTP verified successfully!' });
+    const { email, otp, name, description, password } = req.body;
+    const record = otpStore[email.trim()];
+
+    if (!record) {
+        return res.status(400).json({ message: 'OTP not found.' });
+    }
+
+    if (Date.now() > record.expiry) {
+        delete otpStore[email.trim()];
+        return res.status(400).json({ message: 'OTP expired.' });
+    }
+
+    if (parseInt(otp) === record.otp) {
+        delete otpStore[email.trim()]; // Remove OTP after successful verification
+
+        // Hash the password and store user information in the database
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) {
+                console.error('Error hashing password:', err);
+                return res.status(500).json({ message: 'Server error. Please try again later.' });
+            }
+
+            const insertQuery = `
+                INSERT INTO restaurants (name, email, description, password)
+                VALUES (?, ?, ?, ?)
+            `;
+            db.query(insertQuery, [name.trim(), email.trim(), description, hashedPassword], (err) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({ message: 'A restaurant with this name or email already exists.' });
+                    }
+                    console.error('Database Error:', err);
+                    return res.status(500).json({ message: 'Failed to store user information.' });
+                }
+
+                res.status(200).json({ message: 'OTP verified and user information stored successfully!' });
+            });
+        });
     } else {
-        res.status(400).json({ message: 'Invalid OTP. Please try again.' });
+        res.status(400).json({ message: 'Invalid OTP.' });
     }
 });
 
-// Register a restaurant
 app.post('/api/restaurants', async (req, res) => {
-    const { name, email, description, password, image } = req.body;
+    const { name, email, description, password } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-        const query = `
-            INSERT INTO restaurants (name, email, description, password, image)
-            VALUES (?, ?, ?, ?, ?)`;
-        db.query(query, [name, email, description, hashedPassword, image], (err) => {
+        // Check if the restaurant name already exists
+        const checkNameQuery = `SELECT * FROM restaurants WHERE LOWER(name) = LOWER(?)`;
+        db.query(checkNameQuery, [name.trim()], async (err, results) => {
             if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    return res.status(400).json({ message: 'Email already exists. Please choose a different one.' });
-                }
-                console.error('Database Error:', err); // Log the error for debugging
-                return res.status(500).json({ message: 'Error registering restaurant.' });
+                console.error('Database Error:', err);
+                return res.status(500).json({ message: 'Server error. Please try again later.' });
             }
-            res.status(201).json({ message: 'Restaurant registered successfully!' });
+
+            if (results.length > 0) {
+                return res.status(400).json({ message: 'A restaurant with this name already exists. Please choose a different name.' });
+            }
+
+            // Hash the password and insert the new restaurant
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const insertQuery = `INSERT INTO restaurants (name, email, description, password) VALUES (?, ?, ?, ?)`;
+            db.query(insertQuery, [name.trim(), email.trim(), description, hashedPassword], (err) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({ message: 'Email already exists.' });
+                    }
+                    return res.status(500).json({ message: 'Registration failed.' });
+                }
+                res.status(201).json({ message: 'Restaurant registered successfully!' });
+            });
         });
     } catch (error) {
-        console.error('Server Error:', error); // Log the error for debugging
-        res.status(500).json({ message: 'Error registering restaurant.' });
+        console.error('Server Error:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 });
 
-// Authenticate a restaurant
+// ✅ Fixed login logic
 app.post('/api/authenticate', (req, res) => {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    const query = `SELECT * FROM restaurants WHERE email = ?`;
-    db.query(query, [email], async (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Error authenticating user.' });
-        }
+    const sql = `SELECT * FROM restaurants WHERE LOWER(name) = LOWER(?) AND LOWER(email) = LOWER(?)`;
+    db.query(sql, [name.trim(), email.trim()], async (err, results) => {
+        if (err) return res.status(500).json({ message: 'Database error.' });
+        if (results.length === 0) return res.status(401).json({ message: 'Invalid credentials.' });
 
-        if (results.length === 0) {
-            return res.status(401).json({ message: 'Invalid email or password.' });
-        }
+        const user = results[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(401).json({ message: 'Invalid credentials.' });
 
-        const restaurant = results[0];
-        const isPasswordValid = await bcrypt.compare(password, restaurant.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid email or password.' });
-        }
-
-        res.status(200).json({ message: 'Authentication successful!' });
+        res.status(200).json({
+            message: 'Login successful',
+            restaurant: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                description: user.description,
+                image: user.image,
+            },
+        });
     });
 });
 
-// Fetch restaurant profile by email
-app.get('/api/restaurants/:email', (req, res) => {
-    const { email } = req.params;
-    const query = `SELECT name, email, description, image FROM restaurants WHERE email = ?`;
-    db.query(query, [email], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Error fetching restaurant profile.' });
-        }
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'Restaurant not found.' });
-        }
-        res.status(200).json(results[0]); // Return the first result
+app.get('/api/restaurants/:name', (req, res) => {
+    const { name } = req.params;
+    const sql = `SELECT name, email, description, image FROM restaurants WHERE name = ?`;
+    db.query(sql, [name], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Error fetching profile.' });
+        if (results.length === 0) return res.status(404).json({ message: 'Restaurant not found.' });
+        res.status(200).json(results[0]);
     });
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-});
+app.listen(3000, () => console.log('🚀 Server running at http://localhost:3000'));
