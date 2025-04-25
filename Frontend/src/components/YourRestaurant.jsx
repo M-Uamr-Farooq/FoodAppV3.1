@@ -2,51 +2,61 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function YourRestaurant() {
-  const ownerEmail = sessionStorage.getItem("ownerEmail"); // set this on login
-  const [formData, setFormData] = useState({ name: "", cuisine: "", description: "", image: "" });
-  const [menuItem, setMenuItem] = useState({ name: "", image: "" });
+  const username = sessionStorage.getItem("username"); // Retrieve username from sessionStorage
+  const [profile, setProfile] = useState({});
+  const [menuItems, setMenuItems] = useState([]);
 
-  const handleImageUpload = (e, type) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (type === "restaurant") setFormData((prev) => ({ ...prev, image: reader.result }));
-      else setMenuItem((prev) => ({ ...prev, image: reader.result }));
+  useEffect(() => {
+    if (!username) {
+      alert("You are not logged in!");
+      window.location.href = "/your-restaurant-auth"; // Redirect to login if not authenticated
+      return;
+    }
+
+    // Fetch restaurant profile and menu items
+    const fetchData = async () => {
+      try {
+        const profileResponse = await axios.get(`http://localhost:3000/api/restaurants/${username}`);
+        setProfile(profileResponse.data); // Update profile state
+
+        const menuResponse = await axios.get(`http://localhost:3000/api/menu/${username}`);
+        setMenuItems(menuResponse.data); // Update menu items state
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
-    reader.readAsDataURL(file);
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await axios.post("/api/restaurants", { ...formData, ownerEmail });
-    alert("Profile saved!");
-  };
-
-  const addMenuItem = async () => {
-    if (!menuItem.name || !menuItem.image) return alert("Fill name & image");
-    await axios.post("/api/menu", { ...menuItem, ownerEmail });
-    alert("Menu item added");
-    setMenuItem({ name: "", image: "" });
-  };
+    fetchData();
+  }, [username]);
 
   return (
     <div className="container py-5">
-      <h2>Your Restaurant</h2>
-      <form onSubmit={handleSubmit}>
-        <input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Name" className="form-control mb-2" />
-        <input value={formData.cuisine} onChange={(e) => setFormData({ ...formData, cuisine: e.target.value })} placeholder="Cuisine" className="form-control mb-2" />
-        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Description" className="form-control mb-2" />
-        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, "restaurant")} className="form-control mb-3" />
-        <button className="btn btn-success">Save Profile</button>
-      </form>
+      <h2 className="text-center mb-4">Your Restaurant Profile</h2>
+      {profile.image && (
+        <div className="text-center mb-4">
+          <img
+            src={profile.image}
+            alt={profile.name}
+            className="img-fluid rounded shadow"
+            style={{ maxWidth: "300px" }}
+          />
+        </div>
+      )}
+      <p><strong>Name:</strong> {profile.name}</p>
+      <p><strong>Address:</strong> {profile.address}</p>
+      <p><strong>Phone:</strong> {profile.phone}</p>
+      <p><strong>Email:</strong> {profile.email}</p>
+      <p><strong>Description:</strong> {profile.description}</p>
 
-      <h4 className="mt-4">Add Menu Item</h4>
-      <div className="d-flex gap-2">
-        <input value={menuItem.name} onChange={(e) => setMenuItem({ ...menuItem, name: e.target.value })} placeholder="Item name" className="form-control" />
-        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, "menu")} className="form-control" />
-        <button onClick={addMenuItem} className="btn btn-primary">Add</button>
-      </div>
+      <h4 className="mt-4">Menu Items</h4>
+      <ul>
+        {menuItems.map((item, index) => (
+          <li key={index}>
+            <strong>{item.name}</strong> - ${item.price}
+            {item.image && <img src={item.image} alt={item.name} style={{ width: "50px", marginLeft: "10px" }} />}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
