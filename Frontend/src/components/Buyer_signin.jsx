@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 const Buyer_signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       const res = await fetch('http://localhost:3000/api/buyer-signin', {
         method: 'POST',
@@ -14,21 +16,21 @@ const Buyer_signin = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Login successful!');
-        // Save buyer info/session as needed
+        localStorage.setItem('buyer', JSON.stringify(data.buyer));
+        window.location.href = '/'; // Redirect to home
       } else {
-        alert(data.message || 'Login failed');
+        setError(data.message || 'Sign in failed');
       }
-    } catch (err) {
-      alert('Login failed');
+    } catch {
+      setError('Sign in failed');
     }
   };
 
   return (
-    
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="text-center mb-4">Sign in</h2>
+        {error && <div className="alert alert-danger py-2">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
@@ -52,7 +54,7 @@ const Buyer_signin = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Login</button>
+          <button type="submit" className="btn btn-primary w-100">Sign in</button>
         </form>
         <p className="text-center mt-3">
           Don't have an account? <a href="/buyer-signup" className="text-decoration-none">Sign up</a>

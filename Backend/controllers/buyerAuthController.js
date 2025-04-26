@@ -9,7 +9,7 @@ exports.sendBuyerOtp = (req, res) => {
   if (!email) return res.status(400).json({ message: 'Email required.' });
 
   const otp = Math.floor(100000 + Math.random() * 900000);
-  otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+  otpStore[email.toLowerCase()] = { otp, expires: Date.now() + 5 * 60 * 1000 };
 
   transporter.sendMail({
     from: 'shanisipra428@gmail.com',
@@ -30,24 +30,37 @@ exports.verifyBuyerOtpAndSignup = (req, res) => {
   if (!name || !email || !password || !otp)
     return res.status(400).json({ message: 'All fields required.' });
 
-  const record = otpStore[email];
-  if (!record || Date.now() > record.expires)
+  const record = otpStore[email.toLowerCase()];
+  if (!record || Date.now() > record.expires) {
+    console.error('OTP expired or not found for', email);
     return res.status(400).json({ message: 'OTP expired or not found.' });
+  }
 
-  if (parseInt(otp) !== record.otp)
+  if (parseInt(otp) !== record.otp) {
+    console.error('Invalid OTP for', email, 'Expected:', record.otp, 'Got:', otp);
     return res.status(400).json({ message: 'Invalid OTP.' });
+  }
 
   db.query('SELECT * FROM buyers WHERE LOWER(email) = LOWER(?)', [email.trim().toLowerCase()], async (err, results) => {
-    if (err) return res.status(500).json({ message: 'Database error.' });
-    if (results.length > 0) return res.status(400).json({ message: 'Email already registered.' });
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Database error.' });
+    }
+    if (results.length > 0) {
+      console.error('Email already registered:', email);
+      return res.status(400).json({ message: 'Email already registered.' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     db.query(
       'INSERT INTO buyers (name, email, password) VALUES (?, ?, ?)',
       [name, email.trim().toLowerCase(), hashedPassword],
       (err2, result) => {
-        if (err2) return res.status(500).json({ message: 'Signup failed.' });
-        delete otpStore[email];
+        if (err2) {
+          console.error('Signup failed:', err2);
+          return res.status(500).json({ message: 'Signup failed.' });
+        }
+        delete otpStore[email.toLowerCase()];
         res.status(201).json({ message: 'Signup successful!', buyerId: result.insertId, name, email });
       }
     );
