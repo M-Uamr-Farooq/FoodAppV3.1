@@ -7,7 +7,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const path = location.pathname;
 
-  const isLoggedIn = localStorage.getItem("userToken") !== null;
+  // Check for buyer login (use 'buyer' key for cart/session)
+  const isLoggedIn = localStorage.getItem("buyer") !== null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const showFullNav = path === "/home" || path === "/";
@@ -23,7 +24,7 @@ export default function Navbar() {
   ].includes(path);
 
   const handleSignOut = () => {
-    localStorage.removeItem("userToken");
+    localStorage.removeItem("buyer");
     navigate("/home");
     window.location.reload();
   };
@@ -48,19 +49,6 @@ export default function Navbar() {
         <ul className="navbar-nav d-none d-lg-flex flex-row gap-4 align-items-center mb-0">
           {showFullNav && (
             <>
-              {!isLoggedIn ? (
-                <li className="nav-item">
-                  <Link className="nav-link text-white" to="/buyer-signin">
-                    🔐 Sign In
-                  </Link>
-                </li>
-              ) : (
-                <li className="nav-item">
-                  <button className="btn btn-light" onClick={handleSignOut}>
-                    🚪 Sign Out
-                  </button>
-                </li>
-              )}
               <li className="nav-item">
                 <Link className="nav-link text-white" to="/register-restaurant">
                   🏪 Register Restaurant
@@ -76,15 +64,37 @@ export default function Navbar() {
                   🛒 Cart
                 </Link>
               </li>
+              {!isLoggedIn ? (
+                <li className="nav-item">
+                  <Link className="nav-link text-white" to="/buyer-signin">
+                    🔐 Sign In
+                  </Link>
+                </li>
+              ) : (
+                <li className="nav-item">
+                  <button className="btn btn-light" onClick={handleSignOut}>
+                    🚪 Sign Out
+                  </button>
+                </li>
+              )}
             </>
           )}
 
           {showOnlyHome && (
-            <li className="nav-item">
-              <Link className="nav-link text-white" to="/home">
-                🏠 Home
-              </Link>
-            </li>
+            <>
+              <li className="nav-item">
+                <Link className="nav-link text-white" to="/home">
+                  🏠 Home
+                </Link>
+              </li>
+              {isLoggedIn && (
+                <li className="nav-item">
+                  <button className="btn btn-light" onClick={handleSignOut}>
+                    🚪 Sign Out
+                  </button>
+                </li>
+              )}
+            </>
           )}
         </ul>
       </div>
@@ -98,19 +108,6 @@ export default function Navbar() {
           <ul className="list-unstyled mb-0">
             {showFullNav && (
               <>
-                {!isLoggedIn ? (
-                  <li>
-                    <Link className="dropdown-item fw-semibold" to="/buyer-signin" onClick={() => setIsMenuOpen(false)}>
-                      🔐 Sign In
-                    </Link>
-                  </li>
-                ) : (
-                  <li>
-                    <button className="dropdown-item fw-semibold" onClick={handleSignOut}>
-                      🚪 Sign Out
-                    </button>
-                  </li>
-                )}
                 <li>
                   <Link className="dropdown-item fw-semibold" to="/register-restaurant" onClick={() => setIsMenuOpen(false)}>
                     🏪 Register Restaurant
@@ -126,15 +123,37 @@ export default function Navbar() {
                     🛒 Cart
                   </Link>
                 </li>
+                {!isLoggedIn ? (
+                  <li>
+                    <Link className="dropdown-item fw-semibold" to="/buyer-signin" onClick={() => setIsMenuOpen(false)}>
+                      🔐 Sign In
+                    </Link>
+                  </li>
+                ) : (
+                  <li>
+                    <button className="dropdown-item fw-semibold" onClick={handleSignOut}>
+                      🚪 Sign Out
+                    </button>
+                  </li>
+                )}
               </>
             )}
 
             {showOnlyHome && (
-              <li>
-                <Link className="dropdown-item fw-semibold" to="/home" onClick={() => setIsMenuOpen(false)}>
-                  🏠 Home
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link className="dropdown-item fw-semibold" to="/home" onClick={() => setIsMenuOpen(false)}>
+                    🏠 Home
+                  </Link>
+                </li>
+                {isLoggedIn && (
+                  <li>
+                    <button className="dropdown-item fw-semibold" onClick={handleSignOut}>
+                      🚪 Sign Out
+                    </button>
+                  </li>
+                )}
+              </>
             )}
           </ul>
         </div>

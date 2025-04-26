@@ -21,6 +21,10 @@ export default function Home() {
 const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
 
 const handleAddToCart = (item) => {
+  if (!buyer) {
+    alert("Please sign in or sign up to add items to your cart.");
+    return; // This prevents adding the item if not signed in
+  }
   const stored = localStorage.getItem(cartKey);
   const cartItems = stored ? JSON.parse(stored) : [];
   cartItems.push(item);
