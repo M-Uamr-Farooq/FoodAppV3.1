@@ -7,6 +7,7 @@ const YourRestaurantAuth = () => {
   const [credentials, setCredentials] = useState({ name: '', email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState(""); // Add this to your state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -26,25 +27,27 @@ const YourRestaurantAuth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAuthError(""); // Clear previous error
     if (!validate()) return;
 
     setIsSubmitting(true);
     try {
-        const response = await axios.post('http://localhost:3000/api/authenticate', {
-            email: credentials.email.trim(),
-            password: credentials.password,
-        });
+      const response = await axios.post('http://localhost:3000/api/authenticate', {
+        email: credentials.email.trim(),
+        password: credentials.password,
+      });
 
-        alert(response.data.message);
-        sessionStorage.setItem('restaurantName', response.data.restaurant.name);
-        sessionStorage.setItem('restaurantEmail', response.data.restaurant.email);
-        navigate('/your-restaurant');
+      // Success: store info and redirect, no alert
+      sessionStorage.setItem('restaurantName', response.data.restaurant.name);
+      sessionStorage.setItem('restaurantEmail', response.data.restaurant.email);
+      navigate('/your-restaurant');
     } catch (error) {
-        alert(error.response?.data?.message || 'Login failed. Try again.');
+      // Show backend error on page
+      setAuthError(error.response?.data?.message || 'Login failed. Try again.');
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
-};
+  };
 
   return (
     <div className="bg-light min-vh-100 d-flex align-items-center justify-content-center pt-4">
@@ -136,7 +139,7 @@ const YourRestaurantAuth = () => {
                     </Link>
                   </div>
                 </form>
-
+                {authError && <div className="alert alert-danger mt-3">{authError}</div>} {/* Display error here */}
               </div>
             </div>
           </div>

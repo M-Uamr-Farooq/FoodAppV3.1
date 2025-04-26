@@ -52,7 +52,7 @@ const Cart = () => {
         <div className="mt-5 text-center">
           <h4 className="text-warning">Total: ${total.toFixed(2)}</h4>
           <button className="btn btn-success btn-lg mt-3" onClick={handleOrder}>
-            Order
+            Order Now
           </button>
         </div>
       )}
