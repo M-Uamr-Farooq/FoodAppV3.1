@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function Home() {
   const [menuItems, setMenuItems] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -35,35 +36,56 @@ const handleAddToCart = (item) => {
   return (
     <div className="container py-5">
       <h2 className="text-center text-danger mb-4">🍴 Explore Delicious Menus 🍴</h2>
-      <p className="text-center text-muted mb-5">
+      <p className="text-center text-muted mb-2">
         Discover mouth-watering dishes from the best restaurants in town. Let your cravings guide you!
       </p>
+      <p className="text-center text-success mb-4" style={{ fontWeight: 500, fontSize: "1.1rem" }}>
+        💸 Enjoy hassle-free <span style={{ color: "#ff9800" }}>Cash on Delivery</span> on every order!
+      </p>
+      {/* Search Bar */}
+      <div className="row justify-content-center mb-4">
+        <div className="col-md-6">
+          <input
+            type="text"
+            className="form-control form-control-lg"
+            placeholder="Hungry? Search for burgers, pizza, biryani..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
       <div className="row g-4">
-        {menuItems.map((item, idx) => (
-          <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
-            <div className="card h-100 shadow-lg border-0">
-              <img
-                src={item.image}
-                className="card-img-top"
-                alt={item.item_name}
-                style={{ height: "250px", objectFit: "cover", borderRadius: "10px 10px 0 0" }}
-              />
-              <div className="card-body text-center">
-                <h5 className="card-title text-primary">{item.item_name}</h5>
-                <p className="text-muted mb-1">by <strong>{item.restaurant_name}</strong></p>
-                <p className="text-success fw-bold mb-3">
-                  Rs {Number(item.price).toFixed(2)}
-                </p>
-                <button
-                  className="btn btn-danger w-100"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Add to Cart
-                </button>
+        {menuItems
+          .filter(item =>
+            !search ||
+            item.item_name.toLowerCase().includes(search.toLowerCase()) ||
+            item.restaurant_name.toLowerCase().includes(search.toLowerCase())
+          )
+          .map((item, idx) => (
+            <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
+              <div className="card h-100 shadow-lg border-0">
+                <img
+                  src={item.image}
+                  className="card-img-top"
+                  alt={item.item_name}
+                  style={{ height: "250px", objectFit: "cover", borderRadius: "10px 10px 0 0" }}
+                />
+                <div className="card-body text-center">
+                  <h5 className="card-title text-primary">{item.item_name}</h5>
+                  <p className="text-muted mb-1">by <strong>{item.restaurant_name}</strong></p>
+                  <p className="text-success fw-bold mb-3">
+                    Rs {Number(item.price).toFixed(2)}
+                  </p>
+                  <button
+                    className="btn btn-danger w-100"
+                    onClick={() => handleAddToCart(item)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
