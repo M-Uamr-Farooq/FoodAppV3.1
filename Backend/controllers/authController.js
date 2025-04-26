@@ -1,11 +1,12 @@
+const db = require('../config/db');
 const bcrypt = require('bcrypt');
-const Restaurant = require('../models/restaurantModel');
 
 exports.authenticate = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'Email and password required.' });
 
-  Restaurant.findByEmail(email.trim(), async (err, results) => {
+  const sql = `SELECT * FROM restaurants WHERE LOWER(email) = LOWER(?)`;
+  db.query(sql, [email.trim().toLowerCase()], async (err, results) => {
     if (err) return res.status(500).json({ message: 'Database error.' });
     if (results.length === 0) return res.status(401).json({ message: 'Invalid credentials.' });
 

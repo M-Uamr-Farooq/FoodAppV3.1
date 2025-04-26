@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const menuController = require('../controllers/menuController');
 
-router.get('/:restaurantName', menuController.getMenuByRestaurant);
-router.post('/', menuController.addMenuItem);
-router.delete('/:id', menuController.deleteMenuItem);
-// Optional: Edit menu item
-router.put('/:id', menuController.editMenuItem);
+// Get all menu items (for Home page)
+router.get('/', menuController.getAllMenuItems);
 
+// Get menu items for a specific restaurant
+router.get('/:restaurantName', menuController.getMenuByRestaurant);
+
+// ...other routes...
 module.exports = router;

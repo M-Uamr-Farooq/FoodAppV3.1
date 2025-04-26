@@ -17,20 +17,16 @@ export default function Home() {
     fetchMenuItems();
   }, []);
 
-  const handleAddToCart = async (item) => {
-    try {
-      await axios.post("http://localhost:3000/api/cart", {
-        restaurantName: item.restaurant_name,
-        itemName: item.item_name,
-        price: item.price,
-        image: item.image,
-      });
-      alert("Item added to cart!");
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-      alert("Failed to add item to cart.");
-    }
-  };
+  const buyer = JSON.parse(localStorage.getItem('buyer'));
+const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
+
+const handleAddToCart = (item) => {
+  const stored = localStorage.getItem(cartKey);
+  const cartItems = stored ? JSON.parse(stored) : [];
+  cartItems.push(item);
+  localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  alert("Item added to cart!");
+};
 
   return (
     <div className="container py-5">
@@ -51,7 +47,7 @@ export default function Home() {
               <div className="card-body text-center">
                 <h5 className="card-title text-primary">{item.item_name}</h5>
                 <p className="text-muted mb-1">by <strong>{item.restaurant_name}</strong></p>
-                <p className="text-success fw-bold mb-3">${item.price.toFixed(2)}</p>
+                <p className="text-success fw-bold mb-3">${Number(item.price).toFixed(2)}</p>
                 <button
                   className="btn btn-danger w-100"
                   onClick={() => handleAddToCart(item)}

@@ -4,10 +4,24 @@ const Buyer_signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
-    // Add login logic here
+    try {
+      const res = await fetch('http://localhost:3000/api/buyer-signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Login successful!');
+        // Save buyer info/session as needed
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      alert('Login failed');
+    }
   };
 
   return (

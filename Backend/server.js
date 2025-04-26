@@ -6,12 +6,15 @@ require('./config/db');
 
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+const buyerAuthRoutes = require('./routes/buyerAuthRoutes');
 
-const app = express();
+const app = express(); // <-- move this up!
+
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
+app.use('/api', buyerAuthRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/menu', menuRoutes);
 

@@ -11,6 +11,11 @@ const MenuItem = {
     db.query(query, [restaurantName], callback);
   },
 
+  findAll: (callback) => {
+    const query = 'SELECT * FROM menu_items';
+    db.query(query, callback);
+  },
+
   deleteById: (id, callback) => {
     const query = 'DELETE FROM menu_items WHERE id = ?';
     db.query(query, [id], callback);

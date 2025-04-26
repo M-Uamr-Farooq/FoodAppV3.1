@@ -36,3 +36,10 @@ exports.editMenuItem = (req, res) => {
     res.json({ message: 'Menu item updated.' });
   });
 };
+
+exports.getAllMenuItems = (req, res) => {
+  MenuItem.findAll((err, items) => {
+    if (err) return res.status(500).json({ message: 'Error fetching menu items.' });
+    res.json(items);
+  });
+};
