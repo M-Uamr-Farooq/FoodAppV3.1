@@ -2,87 +2,84 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const FIVE_HOURS = 5 * 60 * 60 * 1000;
+
 const YourRestaurant = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [menu, setMenu] = useState([]);
-  const [newMenuItem, setNewMenuItem] = useState({ itemName: '', price: '', imageUrl: '' });
-  const [restaurantImageUrl, setRestaurantImageUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [imageUrlInput, setImageUrlInput] = useState('');
-
+  const [actionMsg, setActionMsg] = useState('');
+  const [newMenuItem, setNewMenuItem] = useState({ itemName: '', price: '', imageUrl: '' });
   const navigate = useNavigate();
-  const restaurantName = sessionStorage.getItem('restaurantName');
 
+  // Check sessionStorage for restaurant info and expiry
   useEffect(() => {
-    if (!restaurantName) {
+    const stored = sessionStorage.getItem('restaurant');
+    if (!stored) {
       navigate('/your-restaurant-auth');
       return;
     }
+    const data = JSON.parse(stored);
+    if (Date.now() - data.loginTime > FIVE_HOURS) {
+      sessionStorage.removeItem('restaurant');
+      navigate('/your-restaurant-auth');
+      return;
+    }
+    setRestaurant(data);
 
-    const fetchData = async () => {
+    // Fetch menu
+    const fetchMenu = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`http://localhost:3000/api/restaurants/${restaurantName}`);
-        const menuRes = await axios.get(`http://localhost:3000/api/menu/${restaurantName}`);
-        setRestaurant(res.data);
+        const menuRes = await axios.get(`http://localhost:3000/api/menu/${data.name}`);
         setMenu(menuRes.data);
       } catch (err) {
         setError(err.message);
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
+    fetchMenu();
+  }, [navigate, actionMsg]);
 
-    fetchData();
-  }, [restaurantName, navigate]);
-
-  const handleImageUrlUpdate = async () => {
-    if (!imageUrlInput) {
-      alert('Please paste an image URL.');
-      return;
-    }
+  // Remove menu item
+  const handleRemoveMenuItem = async (itemId) => {
+    if (!window.confirm('Are you sure you want to remove this item?')) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/restaurants/${restaurantName}/image`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageUrlInput }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert('Image updated successfully!');
-        setRestaurant((prev) => ({ ...prev, image: imageUrlInput }));
-        setImageUrlInput('');
-      } else {
-        alert(data.message || 'Failed to update image');
-      }
-    } catch (err) {
-      alert('Failed to update image');
+      await axios.delete(`http://localhost:3000/api/menu/${itemId}`);
+      setMenu(menu.filter(item => item.id !== itemId));
+      setActionMsg('Item removed!');
+    } catch {
+      setActionMsg('Failed to remove item');
     }
+    setTimeout(() => setActionMsg(''), 2000);
   };
 
+  // Add menu item
   const handleAddMenuItem = async (e) => {
     e.preventDefault();
     const { itemName, price, imageUrl } = newMenuItem;
-    if (!itemName || !price || !imageUrl) return alert('Fill all fields');
-
+    if (!itemName || !price || !imageUrl) {
+      setActionMsg('Fill all fields');
+      return;
+    }
     try {
       const res = await axios.post(`http://localhost:3000/api/menu`, {
-        restaurantName,
+        restaurantName: restaurant.name,
         itemName,
         price,
         image: imageUrl
       });
-
-      alert(res.data.message);
-      const menuRes = await axios.get(`http://localhost:3000/api/menu/${restaurantName}`);
+      setActionMsg(res.data.message || 'Item added!');
+      // Refresh menu
+      const menuRes = await axios.get(`http://localhost:3000/api/menu/${restaurant.name}`);
       setMenu(menuRes.data);
       setNewMenuItem({ itemName: '', price: '', imageUrl: '' });
     } catch (err) {
-      console.error(err);
-      alert('Failed to add item');
+      setActionMsg('Failed to add item');
     }
+    setTimeout(() => setActionMsg(''), 2000);
   };
 
   if (isLoading) {
@@ -98,90 +95,118 @@ const YourRestaurant = () => {
   }
 
   return (
-    <div className="container py-5 d-flex flex-column align-items-center">
+    <div className="container-fluid py-5 d-flex flex-column align-items-center" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fffbe6 0%, #ffe0b2 100%)' }}>
+      {/* Restaurant Info */}
       {restaurant && (
         <>
-          <h2 className="mb-4 text-warning">🍽️ {restaurant.name}</h2>
-
-          <div className="card shadow-sm p-4 mb-4" style={{ maxWidth: '500px', width: '100%', backgroundColor: '#fff9e6' }}>
-            <div className="text-center">
-              <img
-                src={restaurant.image || 'https://via.placeholder.com/250'}
-                alt="Restaurant"
-                className="img-fluid rounded mb-3"
-                style={{ maxHeight: '250px', objectFit: 'cover', borderRadius: '12px' }}
-              />
-              <div className="input-group mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Paste image URL here"
-                  value={imageUrlInput}
-                  onChange={e => setImageUrlInput(e.target.value)}
-                />
-                <button className="btn btn-warning" type="button" onClick={handleImageUrlUpdate}>
-                  Update Image
-                </button>
-              </div>
-              <p className="mt-3 text-muted">{restaurant.description}</p>
-            </div>
+          <div className="w-100 d-flex flex-column align-items-center mb-4">
+            <img
+              src={restaurant.image || 'https://via.placeholder.com/900x420?text=Restaurant+Image'}
+              alt="Restaurant"
+              className="img-fluid shadow"
+              style={{
+                maxHeight: '420px',
+                maxWidth: '100%',
+                objectFit: 'cover',
+                borderRadius: '32px',
+                marginBottom: '1.5rem',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 1.5px 6px rgba(255,193,7,0.08)'
+              }}
+            />
+            <h1
+              className="fw-bold text-center px-4 py-3 mb-0"
+              style={{
+                fontSize: '2.8rem',
+                color: '#ff9800',
+                letterSpacing: '2px',
+                background: '#fff9e6',
+                borderRadius: '18px',
+                boxShadow: '0 2px 12px rgba(255, 193, 7, 0.08)'
+              }}
+            >
+              🍽️ <span style={{ fontFamily: 'cursive, sans-serif', textShadow: '1px 2px 8px #ffe0b2' }}>{restaurant.name}</span>
+            </h1>
           </div>
 
-          <div className="card shadow-sm p-4 mb-4" style={{ maxWidth: '500px', width: '100%', backgroundColor: '#fffbe6' }}>
-            <h4 className="text-center text-warning mb-3">➕ Add Menu Item</h4>
-            <form onSubmit={handleAddMenuItem}>
-              <div className="mb-3">
-                <label className="form-label">Item Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newMenuItem.itemName}
-                  onChange={(e) => setNewMenuItem({ ...newMenuItem, itemName: e.target.value })}
-                  required
-                />
+          {/* Add Menu Item Form - Same width as Your Menu */}
+          <div className="card shadow-lg p-4 mb-4 w-100" style={{ maxWidth: '1100px', background: '#fffbe6', borderRadius: '24px' }}>
+            <h3 className="text-center text-warning mb-4 fw-bold" style={{ fontSize: '2rem', letterSpacing: '1px' }}>➕ Add Menu Item</h3>
+            <form onSubmit={handleAddMenuItem} className="w-100">
+              <div className="row g-3 justify-content-center">
+                <div className="col-12 col-md-4">
+                  <input
+                    type="text"
+                    className="form-control form-control-lg"
+                    placeholder="Item Name"
+                    value={newMenuItem.itemName}
+                    onChange={(e) => setNewMenuItem({ ...newMenuItem, itemName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col-12 col-md-3">
+                  <input
+                    type="number"
+                    className="form-control form-control-lg"
+                    placeholder="Price (Rs)"
+                    value={newMenuItem.price}
+                    onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col-12 col-md-4">
+                  <input
+                    type="text"
+                    className="form-control form-control-lg"
+                    placeholder="Image URL"
+                    value={newMenuItem.imageUrl}
+                    onChange={(e) => setNewMenuItem({ ...newMenuItem, imageUrl: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label className="form-label">Price ($)</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  value={newMenuItem.price}
-                  onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
-                  required
-                />
+              <div className="row mt-3">
+                <div className="col-12 d-flex justify-content-center">
+                  <button type="submit" className="btn btn-warning btn-lg fw-bold shadow-sm px-5">
+                    Add
+                  </button>
+                </div>
               </div>
-              <div className="mb-3">
-                <label className="form-label">Image URL</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newMenuItem.imageUrl}
-                  onChange={(e) => setNewMenuItem({ ...newMenuItem, imageUrl: e.target.value })}
-                  required
-                />
-              </div>
-              <button type="submit" className="btn btn-warning w-100">Add Item</button>
             </form>
           </div>
 
-          <div className="card shadow-sm p-4" style={{ maxWidth: '900px', width: '100%', backgroundColor: '#fff8cc' }}>
-            <h4 className="text-center text-success mb-4">📋 Your Menu</h4>
+          {actionMsg && (
+            <div className="alert alert-info text-center w-100" style={{ maxWidth: '600px' }}>
+              {actionMsg}
+            </div>
+          )}
+
+          {/* Menu */}
+          <div className="card shadow-lg p-4 w-100" style={{ maxWidth: '1100px', background: '#fff8cc', borderRadius: '24px' }}>
+            <h4 className="text-center text-success mb-4 fw-bold" style={{ fontSize: '1.7rem' }}>📋 Your Menu</h4>
             {menu.length === 0 ? (
               <p className="text-center">No items added yet.</p>
             ) : (
-              <div className="row">
+              <div className="row g-4">
                 {menu.map(item => (
-                  <div className="col-md-4 mb-4" key={item.id}>
-                    <div className="card h-100 shadow-sm border-0">
+                  <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={item.id}>
+                    <div className="card h-100 shadow-sm border-0 position-relative">
                       <img
                         src={item.image}
                         className="card-img-top"
                         alt={item.item_name}
-                        style={{ height: '200px', objectFit: 'cover' }}
+                        style={{ height: '180px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
                       />
-                      <div className="card-body">
-                        <h5 className="card-title">{item.item_name}</h5>
-                        <p className="card-text text-muted">${Number(item.price).toFixed(2)}</p>
+                      <div className="card-body d-flex flex-column align-items-center">
+                        <h5 className="card-title text-primary fw-bold">{item.item_name}</h5>
+                        <p className="card-text text-success fw-bold mb-2">
+                          Rs {Number(item.price).toFixed(2)}
+                        </p>
+                        <button
+                          className="btn btn-outline-danger btn-sm mt-auto"
+                          onClick={() => handleRemoveMenuItem(item.id)}
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   </div>

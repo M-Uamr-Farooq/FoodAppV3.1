@@ -22,6 +22,9 @@ export default function Navbar() {
     "/buyer-signin",
     "/buyer-signup",
   ].includes(path);
+  const showEditProfile = path === "/your-restaurant";
+
+  const [showEdit, setShowEdit] = useState(false); // Add this state
 
   const handleSignOut = () => {
     localStorage.removeItem("buyer");
@@ -96,8 +99,31 @@ export default function Navbar() {
               )}
             </>
           )}
+
+          {/* Show Edit Profile only on /your-restaurant */}
+          {showEditProfile && (
+            <li className="nav-item">
+              <button
+                className="btn btn-outline-warning ms-2"
+                onClick={() => setShowEdit(true)}
+              >
+                ✏️ Edit Profile
+              </button>
+            </li>
+          )}
         </ul>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEdit && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <EditProfileModal setShowEdit={setShowEdit} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom Mobile Dropdown */}
       {isMenuOpen && (
@@ -159,5 +185,85 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+  );
+}
+
+// You can place this inside Navbar.jsx or in a separate file and import it
+function EditProfileModal({ setShowEdit }) {
+  const stored = sessionStorage.getItem('restaurant');
+  const restaurant = stored ? JSON.parse(stored) : { name: '', image: '', loginTime: 0 };
+  const [editData, setEditData] = useState({ name: restaurant.name, image: restaurant.image });
+  const [actionMsg, setActionMsg] = useState('');
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await fetch(`http://localhost:3000/api/restaurants/${restaurant.name}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editData.name, image: editData.image }),
+      });
+      // Update sessionStorage
+      const updated = { ...restaurant, name: editData.name, image: editData.image };
+      sessionStorage.setItem('restaurant', JSON.stringify({ ...updated, loginTime: restaurant.loginTime }));
+      setActionMsg('Profile updated!');
+      setTimeout(() => setShowEdit(false), 1000);
+    } catch {
+      setActionMsg('Failed to update profile');
+    }
+  };
+
+  const handleDeleteRestaurant = async () => {
+    if (!window.confirm('Are you sure you want to delete your restaurant? This cannot be undone.')) return;
+    try {
+      await fetch(`http://localhost:3000/api/restaurants/${restaurant.name}`, { method: 'DELETE' });
+      sessionStorage.removeItem('restaurant');
+      window.location.href = '/your-restaurant-auth';
+    } catch {
+      setActionMsg('Failed to delete restaurant');
+    }
+  };
+
+  const handleSignOut = () => {
+    sessionStorage.removeItem('restaurant');
+    window.location.href = '/your-restaurant-auth';
+  };
+
+  return (
+    <>
+      <div className="modal-header">
+        <h5 className="modal-title">Edit Profile</h5>
+        <button type="button" className="btn-close" onClick={() => setShowEdit(false)}></button>
+      </div>
+      <div className="modal-body">
+        <label className="form-label">Restaurant Name</label>
+        <input
+          type="text"
+          className="form-control mb-3"
+          name="name"
+          value={editData.name}
+          onChange={handleEditChange}
+        />
+        <label className="form-label">Image URL</label>
+        <input
+          type="text"
+          className="form-control mb-3"
+          name="image"
+          value={editData.image}
+          onChange={handleEditChange}
+        />
+      </div>
+      <div className="modal-footer d-flex justify-content-between">
+        <button className="btn btn-danger" onClick={handleDeleteRestaurant}>Delete Restaurant</button>
+        <button className="btn btn-secondary" onClick={handleSignOut}>Sign Out</button>
+        <button className="btn btn-success" onClick={handleEditSave}>Save</button>
+      </div>
+      {actionMsg && (
+        <div className="alert alert-info text-center w-100">{actionMsg}</div>
+      )}
+    </>
   );
 }

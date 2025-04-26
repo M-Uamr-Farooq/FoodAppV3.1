@@ -51,7 +51,9 @@ const handleAddToCart = (item) => {
               <div className="card-body text-center">
                 <h5 className="card-title text-primary">{item.item_name}</h5>
                 <p className="text-muted mb-1">by <strong>{item.restaurant_name}</strong></p>
-                <p className="text-success fw-bold mb-3">${Number(item.price).toFixed(2)}</p>
+                <p className="text-success fw-bold mb-3">
+                  Rs {Number(item.price).toFixed(2)}
+                </p>
                 <button
                   className="btn btn-danger w-100"
                   onClick={() => handleAddToCart(item)}

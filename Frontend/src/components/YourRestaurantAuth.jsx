@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -9,6 +9,18 @@ const YourRestaurantAuth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState(""); // Add this to your state
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('restaurant');
+    if (stored) {
+      const { loginTime } = JSON.parse(stored);
+      if (Date.now() - loginTime < 5 * 60 * 60 * 1000) { // 5 hours
+        navigate('/your-restaurant');
+      } else {
+        sessionStorage.removeItem('restaurant');
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +52,7 @@ const YourRestaurantAuth = () => {
       // Success: store info and redirect, no alert
       sessionStorage.setItem('restaurantName', response.data.restaurant.name);
       sessionStorage.setItem('restaurantEmail', response.data.restaurant.email);
+      sessionStorage.setItem('restaurant', JSON.stringify({loginTime: Date.now()}));
       navigate('/your-restaurant');
     } catch (error) {
       // Show backend error on page
