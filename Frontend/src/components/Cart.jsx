@@ -4,6 +4,10 @@ const Cart = () => {
   const buyer = JSON.parse(localStorage.getItem('buyer'));
   const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
   const [cartItems, setCartItems] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem(cartKey);
@@ -17,8 +21,27 @@ const Cart = () => {
   };
 
   const handleOrder = () => {
-    // Save order to backend if needed, then redirect
-    window.location.href = '/order';
+    setShowModal(true);
+  };
+
+  const handleOrderSubmit = () => {
+    // Validate the inputs
+    if (!name || !phone || !address) {
+      alert('Please fill in all the details.');
+      return;
+    }
+
+    // Construct URL parameters
+    const params = new URLSearchParams();
+    params.append('name', name);
+    params.append('phone', phone);
+    params.append('address', address);
+    cartItems.forEach(item => {
+      params.append('items', JSON.stringify(item));
+    });
+
+    // Redirect to the Order page with the parameters
+    window.location.href = `/order?${params.toString()}`;
   };
 
   const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
@@ -56,6 +79,38 @@ const Cart = () => {
           <button className="btn btn-success btn-lg mt-3" onClick={handleOrder}>
             Order Now
           </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      {showModal && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Enter Your Details</h5>
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label className="form-label">Name</label>
+                  <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Phone Number</label>
+                  <input type="text" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Delivery Address</label>
+                  <input type="text" className="form-control" value={address} onChange={(e) => setAddress(e.target.value)} />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-primary" onClick={handleOrderSubmit}>Submit</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
