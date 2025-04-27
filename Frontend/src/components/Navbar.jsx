@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Get the navigate function
   const path = location.pathname;
 
   // Check for buyer login (use 'buyer' key for cart/session)
@@ -119,7 +119,7 @@ export default function Navbar() {
         <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="modal-dialog">
             <div className="modal-content">
-              <EditProfileModal setShowEdit={setShowEdit} />
+              <EditProfileModal setShowEdit={setShowEdit} navigate={navigate} /> {/* Pass navigate */}
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function Navbar() {
 }
 
 // You can place this inside Navbar.jsx or in a separate file and import it
-function EditProfileModal({ setShowEdit }) {
+function EditProfileModal({ setShowEdit, navigate }) { // Receive navigate prop
   const stored = sessionStorage.getItem('restaurant');
   const restaurant = stored ? JSON.parse(stored) : { name: '', image: '', loginTime: 0 };
   const [editData, setEditData] = useState({ name: restaurant.name, image: restaurant.image });
@@ -221,7 +221,7 @@ function EditProfileModal({ setShowEdit }) {
     try {
       await fetch(`http://localhost:3000/api/restaurants/${restaurant.name}`, { method: 'DELETE' });
       sessionStorage.removeItem('restaurant');
-      window.location.href = '/your-restaurant-auth';
+      navigate('/your-restaurant-auth'); // Use navigate for redirection
     } catch {
       setActionMsg('Failed to delete restaurant');
     }
@@ -229,7 +229,7 @@ function EditProfileModal({ setShowEdit }) {
 
   const handleSignOut = () => {
     sessionStorage.removeItem('restaurant');
-    window.location.href = '/your-restaurant-auth';
+    navigate('/your-restaurant-auth'); // Use navigate for redirection
   };
 
   return (

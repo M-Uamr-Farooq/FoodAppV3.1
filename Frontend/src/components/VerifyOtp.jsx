@@ -1,87 +1,56 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  const { formData } = location.state;
 
-  const handleVerifyOtp = async () => {
+  // Get registration data from location.state or sessionStorage
+  const registrationData = location.state || JSON.parse(sessionStorage.getItem('pendingRestaurant'));
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    if (!registrationData?.email) {
+      setError('Missing registration data. Please register again.');
+      return;
+    }
     try {
-      const response = await axios.post('http://localhost:3000/api/verify-otp', {
-        email: formData.email.trim(),
-        otp: otp.trim(),
-        name: formData.name.trim(),
-        description: formData.description,
-        password: formData.password,
+      await axios.post('http://localhost:3000/api/verify-otp', {
+        ...registrationData,
+        otp
       });
-      alert('OTP verified and user information stored successfully!');
-      navigate('/your-restaurant-auth');
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      alert(error.response?.data?.message || 'Invalid OTP. Please try again.');
+      setSuccess('Registration complete! You can now sign in.');
+      sessionStorage.removeItem('pendingRestaurant');
+      setTimeout(() => navigate('/your-restaurant-auth'), 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to verify OTP');
     }
   };
 
   return (
-    <div className="bg-light min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-5">
-            <div className="card shadow-lg p-4 rounded-4 border border-2 border-success">
-              <div className="card-body p-4 bg-light">
-                <h4 className="text-center text-success mb-4">
-                  <i className="bi bi-shield-lock me-2" />
-                  Verify OTP
-                </h4>
-
-                <form onSubmit={(e) => e.preventDefault()} noValidate>
-                  {/* OTP Input */}
-                  <div className="mb-3">
-                    <label htmlFor="otp" className="form-label">Enter OTP</label>
-                    <div className="input-group input-group-sm">
-                      <span className="input-group-text bg-success text-white">
-                        <i className="bi bi-key" />
-                      </span>
-                      <input
-                        type="text"
-                        id="otp"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder="Enter the OTP sent to your email"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Verify Button */}
-                  <div className="d-grid mb-3">
-                    <button
-                      onClick={handleVerifyOtp}
-                      className="btn btn-success btn-sm fw-bold"
-                    >
-                      Verify OTP
-                    </button>
-                  </div>
-
-                  {/* Back to Login Link */}
-                  <div className="text-center small">
-                    Already verified?{' '}
-                    <a href="/your-restaurant-auth" className="text-decoration-none text-success fw-bold">
-                      <i className="bi bi-arrow-right-circle me-1" />
-                      Login
-                    </a>
-                  </div>
-                </form>
-
-              </div>
-            </div>
-          </div>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100 bg-light">
+      <form onSubmit={handleVerify} className="p-4 shadow rounded bg-white" style={{ minWidth: 320 }}>
+        <h3 className="mb-3 text-center">Verify OTP</h3>
+        <div className="mb-3">
+          <input
+            type="text"
+            value={otp}
+            onChange={e => setOtp(e.target.value)}
+            className="form-control"
+            placeholder="Enter OTP"
+            required
+          />
         </div>
-      </div>
+        <button type="submit" className="btn btn-warning w-100">Verify OTP</button>
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
+        {success && <div className="alert alert-success mt-3">{success}</div>}
+      </form>
     </div>
   );
 };

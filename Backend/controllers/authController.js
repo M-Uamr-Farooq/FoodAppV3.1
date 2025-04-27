@@ -2,11 +2,11 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
 exports.authenticate = (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ message: 'Email and password required.' });
+  const { email, password, name } = req.body;
+  if (!email || !password || !name) return res.status(400).json({ message: 'Name, email, and password required.' });
 
-  const sql = `SELECT * FROM restaurants WHERE LOWER(email) = LOWER(?)`;
-  db.query(sql, [email.trim().toLowerCase()], async (err, results) => {
+  const sql = `SELECT * FROM restaurants WHERE LOWER(email) = LOWER(?) AND LOWER(name) = LOWER(?)`;
+  db.query(sql, [email.trim().toLowerCase(), name.trim().toLowerCase()], async (err, results) => {
     if (err) return res.status(500).json({ message: 'Database error.' });
     if (results.length === 0) return res.status(401).json({ message: 'Invalid credentials.' });
 

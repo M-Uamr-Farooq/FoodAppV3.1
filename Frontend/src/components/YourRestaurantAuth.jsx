@@ -45,14 +45,20 @@ const YourRestaurantAuth = () => {
     setIsSubmitting(true);
     try {
       const response = await axios.post('http://localhost:3000/api/authenticate', {
+        name: credentials.name.trim(),
         email: credentials.email.trim(),
         password: credentials.password,
       });
 
       // Success: store info and redirect, no alert
-      sessionStorage.setItem('restaurantName', response.data.restaurant.name);
-      sessionStorage.setItem('restaurantEmail', response.data.restaurant.email);
-      sessionStorage.setItem('restaurant', JSON.stringify({loginTime: Date.now()}));
+      sessionStorage.setItem('restaurant', JSON.stringify({
+        id: response.data.restaurant.id,
+        name: response.data.restaurant.name,
+        email: response.data.restaurant.email,
+        description: response.data.restaurant.description,
+        image: response.data.restaurant.image,
+        loginTime: Date.now()
+      }));
       navigate('/your-restaurant');
     } catch (error) {
       // Show backend error on page

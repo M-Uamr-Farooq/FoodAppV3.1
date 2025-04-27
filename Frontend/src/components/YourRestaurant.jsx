@@ -21,6 +21,11 @@ const YourRestaurant = () => {
       return;
     }
     const data = JSON.parse(stored);
+    if (!data.name) {
+      sessionStorage.removeItem('restaurant');
+      navigate('/your-restaurant-auth');
+      return;
+    }
     if (Date.now() - data.loginTime > FIVE_HOURS) {
       sessionStorage.removeItem('restaurant');
       navigate('/your-restaurant-auth');
@@ -32,7 +37,7 @@ const YourRestaurant = () => {
     const fetchMenu = async () => {
       try {
         setIsLoading(true);
-        const menuRes = await axios.get(`http://localhost:3000/api/menu/${data.name}`);
+        const menuRes = await axios.get(`http://localhost:3000/api/menu/${encodeURIComponent(data.name)}`); // Use the new route
         setMenu(menuRes.data);
       } catch (err) {
         setError(err.message);

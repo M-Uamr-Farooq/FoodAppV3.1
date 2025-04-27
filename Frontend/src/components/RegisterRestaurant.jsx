@@ -47,7 +47,9 @@ const RegisterRestaurant = () => {
       await axios.post('http://localhost:3000/api/send-otp', {
         email: formData.email.trim(),
       });
-      navigate('/verify-otp', { state: { formData } });
+      // Store registration data in sessionStorage
+      sessionStorage.setItem('pendingRestaurant', JSON.stringify(formData));
+      navigate('/verify-otp'); // Remove { state: { formData } }
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Failed to send OTP');
     } finally {
