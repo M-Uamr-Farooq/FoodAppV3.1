@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import '../styles/Navbar.css'; // Import the CSS file
+import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate(); // Get the navigate function
   const path = location.pathname;
 
-  // Check for buyer login (use 'buyer' key for cart/session)
   const isLoggedIn = localStorage.getItem("buyer") !== null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,141 +25,66 @@ export default function Navbar() {
   ].includes(path);
   const showEditProfile = path === "/your-restaurant";
 
-  const [showEdit, setShowEdit] = useState(false); // Add this state
+  const [showEdit, setShowEdit] = useState(false);
 
   const handleSignOut = () => {
     localStorage.removeItem("buyer");
+    sessionStorage.removeItem('restaurant');
     navigate("/home");
     window.location.reload();
   };
 
   return (
-    <nav className="navbar navbar-dark bg-danger px-3 py-2 shadow-sm position-relative">
-      <div className="container-fluid d-flex justify-content-between align-items-center">
+    <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: '#ffe0b2' }}>
+      <div className="container">
         {/* Logo */}
-        <Link className="navbar-brand fw-bold fs-4 text-white" to="/home">
-          🍴 Foodie Haven
+        <Link className="navbar-brand fw-bold fs-6" style={{ color: '#d84315' }} to="/home">
+          <i className="bi bi-cup-straw me-1"></i> Foodie Haven
         </Link>
 
         {/* Mobile Menu Button */}
         <button
-          className="btn btn-outline-light d-lg-none"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
-          ☰
+          <span className="navbar-toggler-icon"></span>
         </button>
 
         {/* Desktop Menu */}
-        <ul className="navbar-nav d-none d-lg-flex flex-row gap-4 align-items-center mb-0">
-          {showFullNav && (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/register-restaurant">
-                  🏪 Register Restaurant
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/your-restaurant-auth">
-                  📋 Your Restaurant
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/cart">
-                  🛒 Cart
-                </Link>
-              </li>
-              {!isLoggedIn ? (
-                <li className="nav-item">
-                  <Link className="nav-link text-white" to="/buyer-signin">
-                    🔐 Sign In
-                  </Link>
-                </li>
-              ) : (
-                <li className="nav-item">
-                  <button className="btn btn-light" onClick={handleSignOut}>
-                    🚪 Sign Out
-                  </button>
-                </li>
-              )}
-            </>
-          )}
-
-          {showOnlyHome && (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/home">
-                  🏠 Home
-                </Link>
-              </li>
-              {isLoggedIn && (
-                <li className="nav-item">
-                  <button className="btn btn-light" onClick={handleSignOut}>
-                    🚪 Sign Out
-                  </button>
-                </li>
-              )}
-            </>
-          )}
-
-          {/* Show Edit Profile only on /your-restaurant */}
-          {showEditProfile && (
-            <li className="nav-item">
-              <button
-                className="btn btn-outline-warning ms-2"
-                onClick={() => setShowEdit(true)}
-              >
-                ✏️ Edit Profile
-              </button>
-            </li>
-          )}
-        </ul>
-      </div>
-
-      {/* Edit Profile Modal */}
-      {showEdit && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.4)' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <EditProfileModal setShowEdit={setShowEdit} navigate={navigate} /> {/* Pass navigate */}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Custom Mobile Dropdown */}
-      {isMenuOpen && (
-        <div
-          className="position-absolute top-100 start-0 w-100 bg-white shadow-lg rounded-bottom p-3 d-lg-none"
-          style={{ zIndex: 1000 }}
-        >
-          <ul className="list-unstyled mb-0">
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto align-items-center">
             {showFullNav && (
               <>
-                <li>
-                  <Link className="dropdown-item fw-semibold" to="/register-restaurant" onClick={() => setIsMenuOpen(false)}>
-                    🏪 Register Restaurant
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" style={{ color: '#d84315' }} to="/register-restaurant">
+                    <i className="bi bi-shop me-1"></i> Register Restaurant
                   </Link>
                 </li>
-                <li>
-                  <Link className="dropdown-item fw-semibold" to="/your-restaurant-auth" onClick={() => setIsMenuOpen(false)}>
-                    📋 Your Restaurant
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" style={{ color: '#d84315' }} to="/your-restaurant-auth">
+                    <i className="bi bi-pencil-square me-1"></i> Your Restaurant
                   </Link>
                 </li>
-                <li>
-                  <Link className="dropdown-item fw-semibold" to="/cart" onClick={() => setIsMenuOpen(false)}>
-                    🛒 Cart
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" style={{ color: '#d84315' }} to="/cart">
+                    <i className="bi bi-cart me-1"></i> Cart
                   </Link>
                 </li>
                 {!isLoggedIn ? (
-                  <li>
-                    <Link className="dropdown-item fw-semibold" to="/buyer-signin" onClick={() => setIsMenuOpen(false)}>
-                      🔐 Sign In
+                  <li className="nav-item">
+                    <Link className="nav-link fw-semibold" style={{ color: '#d84315' }} to="/buyer-signin">
+                      <i className="bi bi-box-arrow-in-right me-1"></i> Sign In
                     </Link>
                   </li>
                 ) : (
-                  <li>
-                    <button className="dropdown-item fw-semibold" onClick={handleSignOut}>
-                      🚪 Sign Out
+                  <li className="nav-item">
+                    <button className="btn btn-outline-danger" onClick={handleSignOut} style={{ color: '#d84315', borderColor: '#d84315' }}>
+                      <i className="bi bi-box-arrow-left me-1"></i> Sign Out
                     </button>
                   </li>
                 )}
@@ -167,29 +93,51 @@ export default function Navbar() {
 
             {showOnlyHome && (
               <>
-                <li>
-                  <Link className="dropdown-item fw-semibold" to="/home" onClick={() => setIsMenuOpen(false)}>
-                    🏠 Home
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" style={{ color: '#d84315' }} to="/home">
+                    <i className="bi bi-house-door me-1"></i> Home
                   </Link>
                 </li>
                 {isLoggedIn && (
-                  <li>
-                    <button className="dropdown-item fw-semibold" onClick={handleSignOut}>
-                      🚪 Sign Out
+                  <li className="nav-item">
+                    <button className="btn btn-outline-danger" onClick={handleSignOut} style={{ color: '#d84315', borderColor: '#d84315' }}>
+                      <i className="bi bi-box-arrow-left me-1"></i> Sign Out
                     </button>
                   </li>
                 )}
               </>
             )}
+
+            {showEditProfile && (
+              <li className="nav-item">
+                <button
+                  className="btn btn-outline-warning ms-2"
+                  onClick={() => setShowEdit(true)} style={{ color: '#d84315', borderColor: '#d84315' }}
+                >
+                  <i className="bi bi-gear me-1"></i> Edit Profile
+                </button>
+              </li>
+            )}
           </ul>
+        </div>
+      </div>
+
+      {/* Edit Profile Modal */}
+      {showEdit && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <EditProfileModal setShowEdit={setShowEdit} navigate={navigate} />
+            </div>
+          </div>
         </div>
       )}
     </nav>
   );
 }
 
-// You can place this inside Navbar.jsx or in a separate file and import it
-function EditProfileModal({ setShowEdit, navigate }) { // Receive navigate prop
+// Edit Profile Modal component
+function EditProfileModal({ setShowEdit, navigate }) {
   const stored = sessionStorage.getItem('restaurant');
   const restaurant = stored ? JSON.parse(stored) : { name: '', image: '', loginTime: 0 };
   const [editData, setEditData] = useState({ name: restaurant.name, image: restaurant.image });
@@ -206,7 +154,6 @@ function EditProfileModal({ setShowEdit, navigate }) { // Receive navigate prop
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: editData.name, image: editData.image }),
       });
-      // Update sessionStorage
       const updated = { ...restaurant, name: editData.name, image: editData.image };
       sessionStorage.setItem('restaurant', JSON.stringify({ ...updated, loginTime: restaurant.loginTime }));
       setActionMsg('Profile updated!');
@@ -221,7 +168,7 @@ function EditProfileModal({ setShowEdit, navigate }) { // Receive navigate prop
     try {
       await fetch(`http://localhost:3000/api/restaurants/${restaurant.name}`, { method: 'DELETE' });
       sessionStorage.removeItem('restaurant');
-      navigate('/your-restaurant-auth'); // Use navigate for redirection
+      navigate('/your-restaurant-auth');
     } catch {
       setActionMsg('Failed to delete restaurant');
     }
@@ -229,7 +176,7 @@ function EditProfileModal({ setShowEdit, navigate }) { // Receive navigate prop
 
   const handleSignOut = () => {
     sessionStorage.removeItem('restaurant');
-    navigate('/your-restaurant-auth'); // Use navigate for redirection
+    navigate('/your-restaurant-auth');
   };
 
   return (

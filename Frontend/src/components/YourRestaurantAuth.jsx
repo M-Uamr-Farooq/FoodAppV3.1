@@ -7,14 +7,15 @@ const YourRestaurantAuth = () => {
   const [credentials, setCredentials] = useState({ name: '', email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [authError, setAuthError] = useState(""); // Add this to your state
+  const [authError, setAuthError] = useState(""); 
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
     const stored = sessionStorage.getItem('restaurant');
     if (stored) {
       const { loginTime } = JSON.parse(stored);
-      if (Date.now() - loginTime < 5 * 60 * 60 * 1000) { // 5 hours
+      if (Date.now() - loginTime < 5 * 60 * 60 * 1000) { 
         navigate('/your-restaurant');
       } else {
         sessionStorage.removeItem('restaurant');
@@ -39,7 +40,7 @@ const YourRestaurantAuth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAuthError(""); // Clear previous error
+    setAuthError(""); 
     if (!validate()) return;
 
     setIsSubmitting(true);
@@ -50,7 +51,6 @@ const YourRestaurantAuth = () => {
         password: credentials.password,
       });
 
-      // Success: store info and redirect, no alert
       sessionStorage.setItem('restaurant', JSON.stringify({
         id: response.data.restaurant.id,
         name: response.data.restaurant.name,
@@ -61,108 +61,105 @@ const YourRestaurantAuth = () => {
       }));
       navigate('/your-restaurant');
     } catch (error) {
-      // Show backend error on page
-      setAuthError(error.response?.data?.message || 'Login failed. Try again.');
+      setAuthError(error.response?.data?.message || 'Sign In failed. Try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-light min-vh-100 d-flex align-items-center justify-content-center pt-4">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-5">
-            <div className="card shadow-lg p-4 rounded-4 border border-2 border-warning">
-              <div className="card-body p-4 bg-light">
-                <h4 className="text-center text-warning mb-4">
-                  <i className="bi bi-shop me-2" />
-                  Restaurant Login
-                </h4>
+    <div className="container-fluid min-vh-100 d-flex justify-content-center align-items-center pt-4"
+         style={{
+           background: 'url("https://images.unsplash.com/photo-1494595418061-8b6a6342560c?crop=entropy&cs=tinysrgb&fit=max&ixid=MXwyMDg4fDB8MHxwaG90by1mYWR8Nnx8Zm9vZCwgY29va2llfGVtZ3JlZW58&ixlib=rb-1.2.1&q=80")',
+           backgroundSize: 'cover',
+           backgroundPosition: 'center',
+           color: 'white'
+         }}>
+      <div className="card p-4 shadow-lg rounded-4" style={{ maxWidth: '500px', width: '100%', backgroundColor: '#f7f3e3', border: '2px solid #e0a96d' }}>
+        <h4 className="text-center text-danger mb-4">
+          Restaurant Sign In
+        </h4>
 
-                <form onSubmit={handleSubmit} noValidate>
-                  {/* Name */}
-                  <div className="mb-3">
-                    <label className="form-label">Restaurant Name</label>
-                    <div className="input-group input-group-sm">
-                      <span className="input-group-text bg-warning text-white">
-                        <i className="bi bi-person-circle" />
-                      </span>
-                      <input
-                        type="text"
-                        name="name"
-                        className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
-                        value={credentials.name}
-                        onChange={handleChange}
-                        placeholder="Enter name"
-                      />
-                      <div className="invalid-feedback">{errors.name}</div>
-                    </div>
-                  </div>
+        <div className="text-center mb-4">
+          <h2 className="text-warning">Ready to Serve Delicious Dishes?</h2>
+          <p className="lead text-dark">Sign in to manage your menu, attract hungry customers, and grow your food business.</p>
+        </div>
 
-                  {/* Email */}
-                  <div className="mb-3">
-                    <label className="form-label">Email</label>
-                    <div className="input-group input-group-sm">
-                      <span className="input-group-text bg-warning text-white">
-                        <i className="bi bi-envelope" />
-                      </span>
-                      <input
-                        type="email"
-                        name="email"
-                        className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
-                        value={credentials.email}
-                        onChange={handleChange}
-                        placeholder="Enter email"
-                      />
-                      <div className="invalid-feedback">{errors.email}</div>
-                    </div>
-                  </div>
+        <form onSubmit={handleSubmit} noValidate>
+          {/* Name */}
+          <div className="mb-3">
+            <label className="form-label text-dark">Restaurant Name</label>
+            <input
+              type="text"
+              name="name"
+              className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
+              value={credentials.name}
+              onChange={handleChange}
+              placeholder="Enter your restaurant's name"
+              style={{ borderRadius: '10px', paddingLeft: '10px' }}
+            />
+            <div className="invalid-feedback">{errors.name}</div>
+          </div>
 
-                  {/* Password */}
-                  <div className="mb-3">
-                    <label className="form-label">Password</label>
-                    <div className="input-group input-group-sm">
-                      <span className="input-group-text bg-warning text-white">
-                        <i className="bi bi-lock" />
-                      </span>
-                      <input
-                        type="password"
-                        name="password"
-                        className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
-                        value={credentials.password}
-                        onChange={handleChange}
-                        placeholder="Enter password"
-                      />
-                      <div className="invalid-feedback">{errors.password}</div>
-                    </div>
-                  </div>
+          {/* Email */}
+          <div className="mb-3">
+            <label className="form-label text-dark">Email</label>
+            <input
+              type="email"
+              name="email"
+              className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
+              value={credentials.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              style={{ borderRadius: '10px', paddingLeft: '10px' }}
+            />
+            <div className="invalid-feedback">{errors.email}</div>
+          </div>
 
-                  {/* Submit Button */}
-                  <div className="d-grid mb-3">
-                    <button
-                      type="submit"
-                      className="btn btn-warning btn-sm fw-bold"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Logging in...' : 'Login'}
-                    </button>
-                  </div>
-
-                  {/* Register Link */}
-                  <div className="text-center small">
-                    Don't have an account?{' '}
-                    <Link to="/register-restaurant" className="text-decoration-none text-warning fw-bold">
-                      <i className="bi bi-pencil-square me-1" />
-                      Register
-                    </Link>
-                  </div>
-                </form>
-                {authError && <div className="alert alert-danger mt-3">{authError}</div>} {/* Display error here */}
-              </div>
+          {/* Password */}
+          <div className="mb-3">
+            <label className="form-label text-dark">Password</label>
+            <div className="input-group input-group-sm">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
+                value={credentials.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+                style={{ borderRadius: '10px', paddingLeft: '10px' }}
+              />
+              <span className="input-group-text bg-warning text-white" 
+                    style={{ cursor: 'pointer', borderRadius: '50%' }}
+                    onClick={() => setShowPassword(!showPassword)}>
+                <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} style={{ fontSize: '18px' }} />
+              </span>
+              <div className="invalid-feedback">{errors.password}</div>
             </div>
           </div>
-        </div>
+
+          {/* Submit Button */}
+          <div className="d-grid mb-3">
+            <button
+              type="submit"
+              className="btn btn-warning btn-sm fw-bold shadow-sm"
+              style={{ borderRadius: '8px', fontSize: '14px' }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
+            </button>
+          </div>
+
+          {/* Register Link */}
+          <div className="text-center small">
+            Don't have an account?{' '}
+            <Link to="/register-restaurant" className="text-decoration-none text-warning fw-bold">
+              Register
+            </Link>
+          </div>
+        </form>
+
+        {authError && <div className="alert alert-danger mt-3">{authError}</div>} 
       </div>
     </div>
   );

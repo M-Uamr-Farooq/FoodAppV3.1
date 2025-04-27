@@ -16,6 +16,8 @@ const RegisterRestaurant = () => {
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
@@ -47,9 +49,8 @@ const RegisterRestaurant = () => {
       await axios.post('http://localhost:3000/api/send-otp', {
         email: formData.email.trim(),
       });
-      // Store registration data in sessionStorage
       sessionStorage.setItem('pendingRestaurant', JSON.stringify(formData));
-      navigate('/verify-otp'); // Remove { state: { formData } }
+      navigate('/verify-otp');
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Failed to send OTP');
     } finally {
@@ -61,7 +62,6 @@ const RegisterRestaurant = () => {
     <div className="bg-light min-vh-100 d-flex align-items-center justify-content-center pt-4">
       <div className="card shadow-lg p-4 rounded-4 border border-2 border-warning" style={{ width: '100%', maxWidth: '480px' }}>
         <h4 className="text-center text-warning mb-3">
-          <i className="bi bi-pencil-square me-2" />
           Register Your Restaurant
         </h4>
 
@@ -102,10 +102,10 @@ const RegisterRestaurant = () => {
             <textarea
               name="description"
               className={`form-control shadow-none ${errors.description ? 'is-invalid' : ''}`}
-              rows="2"
+              rows="3"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Brief description"
+              placeholder="Brief description of your restaurant"
             />
             <div className="invalid-feedback">{errors.description}</div>
           </div>
@@ -113,31 +113,50 @@ const RegisterRestaurant = () => {
           {/* Password */}
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password"
-            />
+            <div className="input-group">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+              />
+              <span
+                className="input-group-text bg-warning text-white"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} style={{ fontSize: '18px' }} />
+              </span>
+            </div>
             <div className="invalid-feedback">{errors.password}</div>
           </div>
 
           {/* Confirm Password */}
           <div className="mb-3">
             <label className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              className={`form-control shadow-none ${errors.confirmPassword ? 'is-invalid' : ''}`}
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm password"
-            />
+            <div className="input-group">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                className={`form-control shadow-none ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+              />
+              <span
+                className="input-group-text bg-warning text-white"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`} style={{ fontSize: '18px' }} />
+              </span>
+            </div>
             <div className="invalid-feedback">{errors.confirmPassword}</div>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="btn btn-warning w-100 fw-bold"
@@ -146,6 +165,7 @@ const RegisterRestaurant = () => {
             {isSubmitting ? 'Registering...' : 'Register'}
           </button>
 
+          {/* Already have an account Link */}
           <p className="text-center mt-3 mb-0 small">
             Already have an account?{' '}
             <Link to="/your-restaurant-auth" className="text-decoration-none text-primary">

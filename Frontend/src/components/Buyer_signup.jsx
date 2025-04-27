@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Buyer_signup = () => {
   const [step, setStep] = useState(1);
@@ -70,78 +71,117 @@ const Buyer_signup = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('http://localhost:3000/api/buyer-signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        // Store buyer info for cart and session
-        localStorage.setItem('buyer', JSON.stringify(data.buyer));
-        // Redirect to Home page
-        window.location.href = '/';
-      } else {
-        alert(data.message || 'Sign in failed');
-      }
-    } catch {
-      alert('Login failed');
-    }
-  };
-
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="text-center mb-4">Sign Up</h2>
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{
+        backgroundImage: 'url("https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <div
+        className="card p-4 shadow"
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          backgroundColor: 'white',
+          borderRadius: '12px',
+        }}
+      >
+        <h2 className="text-center mb-2 text-warning">
+          <i className="bi bi-person-plus me-2"></i>Join the Foodie Club!
+        </h2>
+        <p className="text-center mb-4" style={{ fontSize: '0.9rem', color: '#555' }}>
+          Sign up and satisfy your cravings 🍕🍔🥗
+        </p>
+
         {errors.general && (
           <div className="alert alert-danger py-2">{errors.general}</div>
         )}
+
         {step === 1 ? (
           <form onSubmit={handleSendOtp}>
             <div className="mb-3">
-              <label htmlFor="name" className="form-label">Name</label>
-              <input type="text" className={`form-control${errors.name ? ' is-invalid' : ''}`} id="name" value={name}
-                onChange={e => setName(e.target.value)} required />
+              <label className="form-label">Name</label>
+              <input
+                type="text"
+                placeholder="What's your delicious name? 😋"
+                className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
               {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
+
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email address</label>
-              <input type="email" className={`form-control${errors.email ? ' is-invalid' : ''}`} id="email" value={email}
-                onChange={e => setEmail(e.target.value)} required />
+              <label className="form-label">Email address</label>
+              <input
+                type="email"
+                placeholder="Your feast alerts inbox 📬"
+                className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
               {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
+
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Create Password</label>
-              <input type="password" className={`form-control${errors.password ? ' is-invalid' : ''}`} id="password" value={password}
-                onChange={e => setPassword(e.target.value)} required />
+              <label className="form-label">Create Password</label>
+              <input
+                type="password"
+                placeholder="A tasty secret 🍯"
+                className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             </div>
+
             <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-              <input type="password" className={`form-control${errors.confirmPassword ? ' is-invalid' : ''}`} id="confirmPassword" value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)} required />
+              <label className="form-label">Confirm Password</label>
+              <input
+                type="password"
+                placeholder="Repeat your tasty secret 🔒"
+                className={`form-control shadow-none ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
               {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
             </div>
-            <button type="submit" className="btn btn-primary w-100" disabled={isSending}>
-              {isSending ? 'Sending OTP...' : 'Send OTP'}
+
+            <button type="submit" className="btn btn-warning w-100" disabled={isSending}>
+              {isSending ? 'Sending OTP...' : 'Send OTP 🍩'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleSignup}>
             <div className="mb-3">
-              <label htmlFor="otp" className="form-label">Enter OTP sent to your email</label>
-              <input type="text" className={`form-control${errors.otp ? ' is-invalid' : ''}`} id="otp" value={otp}
-                onChange={e => setOtp(e.target.value)} required />
+              <label className="form-label">Enter OTP</label>
+              <input
+                type="text"
+                placeholder="Check your food inbox! 🍗"
+                className={`form-control shadow-none ${errors.otp ? 'is-invalid' : ''}`}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+              />
               {errors.otp && <div className="invalid-feedback">{errors.otp}</div>}
             </div>
-            <button type="submit" className="btn btn-success w-100">Verify & Signup</button>
+
+            <button type="submit" className="btn btn-success w-100">
+              Verify & Feast 🎉
+            </button>
           </form>
         )}
+
         <p className="text-center mt-3">
-          Already have an account? <a href="/buyer-signin" className="text-decoration-none">Sign in</a>
+          Already a foodie? <a href="/buyer-signin" className="text-warning">Login to Eat</a>
         </p>
       </div>
     </div>

@@ -1,0 +1,29 @@
+.navbar {
+  background-color: #ffe0b2; /* Light orange background color */
+  padding: 0.3rem 1rem; /* Reduced padding */
+}
+
+.navbar-brand {
+  font-size: 1rem; /* Adjusted font size */
+  color: #d84315; /* Deep Orange color */
+}
+
+.navbar-nav .nav-link {
+  color: #d84315; /* Deep Orange color */
+  font-weight: 500;
+  padding: 0.3rem 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #bf360c; /* Darker Deep Orange color on hover */
+}
+
+.btn-outline-danger {
+  color: #d84315; /* Deep Orange color */
+  border-color: #d84315; /* Deep Orange color */
+}
+
+.btn-outline-danger:hover {
+  background-color: #d84315; /* Deep Orange color */
+  color: #fff; /* White text */
+}
