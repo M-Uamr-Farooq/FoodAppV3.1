@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import '../styles/Home.module.css'; // Corrected import path
 
 export default function Home() {
   const [menuItems, setMenuItems] = useState([]);
   const [search, setSearch] = useState("");
+  const [notification, setNotification] = useState({ message: '', type: '' });
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -19,19 +21,21 @@ export default function Home() {
   }, []);
 
   const buyer = JSON.parse(localStorage.getItem('buyer'));
-const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
+  const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
 
-const handleAddToCart = (item) => {
-  if (!buyer) {
-    alert("Please sign in or sign up to add items to your cart.");
-    return; // This prevents adding the item if not signed in
-  }
-  const stored = localStorage.getItem(cartKey);
-  const cartItems = stored ? JSON.parse(stored) : [];
-  cartItems.push(item);
-  localStorage.setItem(cartKey, JSON.stringify(cartItems));
-  alert("Item added to cart!");
-};
+  const handleAddToCart = (item) => {
+    if (!buyer) {
+      setNotification({ message: "Please sign in or sign up to add items to your cart.", type: 'warning' });
+      setTimeout(() => setNotification({ message: '', type: '' }), 3000);
+      return; // This prevents adding the item if not signed in
+    }
+    const stored = localStorage.getItem(cartKey);
+    const cartItems = stored ? JSON.parse(stored) : [];
+    cartItems.push(item);
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+    setNotification({ message: "Item added to cart!", type: 'success' });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3000);
+  };
 
   return (
     <div className="container py-5">
@@ -47,13 +51,21 @@ const handleAddToCart = (item) => {
         <div className="col-md-6">
           <input
             type="text"
-            className="form-control form-control-lg"
+            className="form-control form-control-lg search-input shadow-none" // Added shadow-none class
             placeholder="Hungry? Search for burgers, pizza, biryani..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
       </div>
+
+      {/* Notification */}
+      {notification.message && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="row g-4">
         {menuItems
           .filter(item =>

@@ -91,7 +91,7 @@ const YourRestaurantAuth = () => {
                       <input
                         type="text"
                         name="name"
-                        className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
                         value={credentials.name}
                         onChange={handleChange}
                         placeholder="Enter name"
@@ -110,7 +110,7 @@ const YourRestaurantAuth = () => {
                       <input
                         type="email"
                         name="email"
-                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
                         value={credentials.email}
                         onChange={handleChange}
                         placeholder="Enter email"
@@ -129,7 +129,7 @@ const YourRestaurantAuth = () => {
                       <input
                         type="password"
                         name="password"
-                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                        className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
                         value={credentials.password}
                         onChange={handleChange}
                         placeholder="Enter password"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../styles/YourRestaurant.css'; 
 
 const FIVE_HOURS = 5 * 60 * 60 * 1000;
 
@@ -179,34 +180,31 @@ const YourRestaurant = () => {
                 <div className="col-12 col-md-4">
                   <input
                     type="text"
-                    className="form-control form-control-lg"
+                    className="form-control form-control-lg shadow-none"
                     placeholder="Item Name (e.g. Cheesy Burger)"
                     value={newMenuItem.itemName}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, itemName: e.target.value })}
                     required
-                    style={{ fontWeight: 500, fontSize: '1.1rem' }}
                   />
                 </div>
                 <div className="col-12 col-md-3">
                   <input
                     type="number"
-                    className="form-control form-control-lg"
+                    className="form-control form-control-lg shadow-none no-spinners"
                     placeholder="Price (Rs)"
                     value={newMenuItem.price}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
                     required
-                    style={{ fontWeight: 500, fontSize: '1.1rem' }}
                   />
                 </div>
                 <div className="col-12 col-md-4">
                   <input
                     type="text"
-                    className="form-control form-control-lg"
+                    className="form-control form-control-lg shadow-none"
                     placeholder="Image URL (make it tasty!)"
                     value={newMenuItem.imageUrl}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, imageUrl: e.target.value })}
                     required
-                    style={{ fontWeight: 500, fontSize: '1.1rem' }}
                   />
                 </div>
               </div>

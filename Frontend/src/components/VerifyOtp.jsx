@@ -42,7 +42,7 @@ const VerifyOtp = () => {
             type="text"
             value={otp}
             onChange={e => setOtp(e.target.value)}
-            className="form-control"
+            className="form-control shadow-none" // Added shadow-none class
             placeholder="Enter OTP"
             required
           />

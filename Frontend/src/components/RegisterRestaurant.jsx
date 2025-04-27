@@ -74,7 +74,7 @@ const RegisterRestaurant = () => {
             <input
               type="text"
               name="name"
-              className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+              className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter name"
@@ -88,7 +88,7 @@ const RegisterRestaurant = () => {
             <input
               type="email"
               name="email"
-              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+              className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter email"
@@ -101,7 +101,7 @@ const RegisterRestaurant = () => {
             <label className="form-label">Description</label>
             <textarea
               name="description"
-              className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+              className={`form-control shadow-none ${errors.description ? 'is-invalid' : ''}`}
               rows="2"
               value={formData.description}
               onChange={handleChange}
@@ -116,7 +116,7 @@ const RegisterRestaurant = () => {
             <input
               type="password"
               name="password"
-              className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+              className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter password"
@@ -130,7 +130,7 @@ const RegisterRestaurant = () => {
             <input
               type="password"
               name="confirmPassword"
-              className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+              className={`form-control shadow-none ${errors.confirmPassword ? 'is-invalid' : ''}`}
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Confirm password"
