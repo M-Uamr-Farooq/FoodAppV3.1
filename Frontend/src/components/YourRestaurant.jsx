@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../styles/YourRestaurant.css'; 
+import '../styles/YourRestaurant.css';
 
 const FIVE_HOURS = 5 * 60 * 60 * 1000;
 
@@ -102,124 +102,98 @@ const YourRestaurant = () => {
 
   return (
     <div
-      className="container-fluid py-5 d-flex flex-column align-items-center"
+      className="container-fluid py-5"
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #fffbe6 0%, #ffe0b2 100%)',
+        background: '#f8f9fa', // Changed background to low white
+        color: '#fff',
       }}
     >
-      {restaurant && (
-        <>
-          {/* Modern Restaurant Banner */}
-          <div className="w-100 d-flex flex-column align-items-center mb-4">
-            <div
+      {restaurant ? (
+        <div className="d-flex flex-column align-items-center">
+          {/* Restaurant Image and Name */}
+          <div className="w-100 mb-4 d-flex justify-content-center">
+            <img
+              src={restaurant.image || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1100&q=80'}
+              alt="Restaurant"
               style={{
                 width: '100%',
                 maxWidth: 1100,
-                borderRadius: '36px',
-                overflow: 'hidden',
-                boxShadow: '0 8px 40px 0 rgba(255, 140, 0, 0.18), 0 2px 8px 0 rgba(255,193,7,0.10)',
-                background: 'linear-gradient(120deg, #fff3e0 60%, #ffe0b2 100%)',
-              }}
-            >
-              <img
-                src={restaurant.image || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1100&q=80'}
-                alt="Restaurant"
-                style={{
-                  width: '100%',
-                  height: '370px',
-                  objectFit: 'cover',
-                  filter: 'brightness(0.93) saturate(1.18) contrast(1.08)',
-                  transition: '0.3s',
-                  display: 'block',
-                }}
-              />
-            </div>
-            {/* Restaurant Name - below the image, no background */}
-            <h1
-              className="fw-bold mt-4 mb-3 text-center"
-              style={{
-                fontFamily: "'Pacifico', cursive, sans-serif",
-                fontSize: '2.8rem',
-                color: '#ff6f00',
-                letterSpacing: '2px',
-                textShadow: '0 6px 24px #ffe082, 0 2px 8px #fffbe6, 0 1px 0 #fff9e6',
-                lineHeight: 1.1,
+                height: '370px',
+                objectFit: 'cover',
                 display: 'block',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }}
-            >
-              <span role="img" aria-label="plate">🍽️</span> {restaurant.name}
-            </h1>
+            />
           </div>
+          <h1
+            className="text-center mt-2"
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '2.75rem',
+              color: '#333', // Changed color to dark gray
+              fontWeight: '600',
+            }}
+          >
+            {restaurant.name}
+          </h1>
 
-          {/* Add Menu Item Card */}
+          {/* Add Menu Item Form */}
           <div
-            className="card shadow-lg p-4 mb-4 w-100"
+            className="w-100 mb-4"
             style={{
               maxWidth: '1100px',
-              background: 'linear-gradient(120deg, #fffbe6 80%, #ffe0b2 100%)',
-              borderRadius: '24px',
-              border: 'none',
-              boxShadow: '0 4px 32px 0 rgba(255, 193, 7, 0.13)',
+              padding: '30px',
+              background: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             }}
           >
             <h3
-              className="text-center mb-4 fw-bold"
+              className="text-center mb-4"
               style={{
-                fontSize: '2.1rem',
-                letterSpacing: '1px',
-                color: '#ff9800',
-                fontFamily: "'Baloo 2', cursive, sans-serif",
-                textShadow: '0 2px 8px #ffe0b2',
+                fontSize: '2rem',
+                color: '#333',
+                fontWeight: '500',
               }}
             >
-              <span role="img" aria-label="add">🍔</span> Add a Mouth-Watering Menu Item
+              Add a Menu Item
             </h3>
             <form onSubmit={handleAddMenuItem} className="w-100">
-              <div className="row g-3 justify-content-center">
-                <div className="col-12 col-md-4">
+              <div className="row g-4">
+                <div className="col-md-4">
                   <input
                     type="text"
-                    className="form-control form-control-lg shadow-none"
-                    placeholder="Item Name (e.g. Cheesy Burger)"
+                    className="form-control form-control-lg"
+                    placeholder="Item Name"
                     value={newMenuItem.itemName}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, itemName: e.target.value })}
                     required
                   />
                 </div>
-                <div className="col-12 col-md-3">
+                <div className="col-md-3">
                   <input
                     type="number"
-                    className="form-control form-control-lg shadow-none no-spinners"
+                    className="form-control form-control-lg"
                     placeholder="Price (Rs)"
                     value={newMenuItem.price}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
                     required
                   />
                 </div>
-                <div className="col-12 col-md-4">
+                <div className="col-md-4">
                   <input
                     type="text"
-                    className="form-control form-control-lg shadow-none"
-                    placeholder="Image URL (make it tasty!)"
+                    className="form-control form-control-lg"
+                    placeholder="Image URL"
                     value={newMenuItem.imageUrl}
                     onChange={(e) => setNewMenuItem({ ...newMenuItem, imageUrl: e.target.value })}
                     required
                   />
                 </div>
-              </div>
-              <div className="row mt-3">
-                <div className="col-12 d-flex justify-content-center">
-                  <button
-                    type="submit"
-                    className="btn btn-warning btn-lg fw-bold shadow-sm px-5"
-                    style={{
-                      fontSize: '1.3rem',
-                      letterSpacing: '1px',
-                      borderRadius: '12px',
-                      boxShadow: '0 2px 8px #ffe082',
-                    }}
-                  >
+                <div className="col-md-1">
+                  <button type="submit" className="btn btn-success btn-lg">
                     Add
                   </button>
                 </div>
@@ -233,41 +207,49 @@ const YourRestaurant = () => {
             </div>
           )}
 
-          {/* Menu */}
+          {/* Menu Items */}
           <div
-            className="card shadow-lg p-4 w-100"
+            className="w-100"
             style={{
               maxWidth: '1100px',
-              background: 'linear-gradient(120deg, #fff8cc 80%, #ffe0b2 100%)',
-              borderRadius: '24px',
-              border: 'none',
-              boxShadow: '0 4px 32px 0 rgba(255, 193, 7, 0.13)',
+              padding: '30px',
+              background: 'rgba(241, 241, 241, 0.7)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             }}
           >
             <h4
-              className="text-center text-success mb-4 fw-bold"
+              className="text-center mb-4"
               style={{
-                fontSize: '1.7rem',
-                fontFamily: "'Baloo 2', cursive, sans-serif",
-                letterSpacing: '1px',
-                textShadow: '0 2px 8px #fffbe6',
+                fontSize: '1.75rem',
+                color: '#333',
+                fontWeight: '500',
               }}
             >
-              <span role="img" aria-label="menu">📋</span> Your Menu
+              Your Menu
             </h4>
             {menu.length === 0 ? (
               <p className="text-center">No items added yet.</p>
             ) : (
-              <div className="row g-4">
+              <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 {menu.map(item => (
-                  <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={item.id}>
+                  <div className="col" key={item.id}>
                     <div
-                      className="card h-100 shadow-sm border-0 position-relative"
+                      className="card h-100 border-0 shadow-sm position-relative"
                       style={{
-                        borderRadius: '18px',
-                        background: '#fffbe6',
-                        boxShadow: '0 2px 12px #ffe082',
-                        transition: 'transform 0.15s',
+                        background: '#fff',
+                        borderRadius: '8px',
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1), 0px 0px 20px rgba(0, 0, 0, 0.05)',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-8px)';
+                        e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.1), 0px 0px 20px rgba(0, 0, 0, 0.05)';
                       }}
                     >
                       <img
@@ -275,34 +257,29 @@ const YourRestaurant = () => {
                         className="card-img-top"
                         alt={item.item_name}
                         style={{
-                          height: '180px',
+                          height: '190px',
                           objectFit: 'cover',
-                          borderRadius: '12px 12px 0 0',
-                          filter: 'saturate(1.15) contrast(1.08)',
+                          borderRadius: '8px',
                         }}
                       />
-                      <div className="card-body d-flex flex-column align-items-center">
+                      <div className="card-body d-flex flex-column align-items-center text-center">
                         <h5
-                          className="card-title text-primary fw-bold"
+                          className="card-title"
                           style={{
-                            fontFamily: "'Baloo 2', cursive, sans-serif",
-                            fontSize: '1.2rem',
-                            letterSpacing: '1px',
+                            fontSize: '1.25rem',
+                            marginBottom: '0.5rem',
+                            color: '#333',
+                            fontWeight: '600',
                           }}
                         >
                           {item.item_name}
                         </h5>
-                        <p className="card-text text-success fw-bold mb-2" style={{ fontSize: '1.1rem' }}>
+                        <p className="card-text" style={{ fontSize: '1.1rem', color: '#28a745' }}>
                           Rs {Number(item.price).toFixed(2)}
                         </p>
                         <button
                           className="btn btn-outline-danger btn-sm mt-auto"
                           onClick={() => handleRemoveMenuItem(item.id)}
-                          style={{
-                            borderRadius: '8px',
-                            fontWeight: 500,
-                            letterSpacing: '1px',
-                          }}
                         >
                           Remove
                         </button>
@@ -313,7 +290,9 @@ const YourRestaurant = () => {
               </div>
             )}
           </div>
-        </>
+        </div>
+      ) : (
+        <div className="alert alert-warning text-center">Loading restaurant data...</div>
       )}
     </div>
   );

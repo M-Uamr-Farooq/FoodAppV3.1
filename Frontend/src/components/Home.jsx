@@ -46,6 +46,7 @@ export default function Home() {
       <p className="text-center text-success mb-4" style={{ fontWeight: 500, fontSize: "1.1rem" }}>
         💸 Enjoy hassle-free <span style={{ color: "#ff9800" }}>Cash on Delivery</span> on every order!
       </p>
+
       {/* Search Bar */}
       <div className="row justify-content-center mb-4">
         <div className="col-md-6">
@@ -75,12 +76,31 @@ export default function Home() {
           )
           .map((item, idx) => (
             <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
-              <div className="card h-100 shadow-lg border-0">
+              <div
+                className="card h-100 shadow-lg border-0 menu-item-card"
+                style={{
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  cursor: 'pointer',
+                  borderRadius: '16px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-6px)';
+                  e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
+                }}
+              >
                 <img
                   src={item.image}
                   className="card-img-top"
                   alt={item.item_name}
-                  style={{ height: "250px", objectFit: "cover", borderRadius: "10px 10px 0 0" }}
+                  style={{
+                    height: "250px",
+                    objectFit: "cover",
+                    borderRadius: "10px 10px 0 0"
+                  }}
                 />
                 <div className="card-body text-center">
                   <h5 className="card-title text-primary">{item.item_name}</h5>
