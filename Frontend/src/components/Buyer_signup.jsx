@@ -107,11 +107,13 @@ const Buyer_signup = () => {
               <label className="form-label">Name</label>
               <input
                 type="text"
+                name="name" // Add name attribute
                 placeholder="What's your delicious name? 😋"
                 className={`form-control shadow-none ${errors.name ? 'is-invalid' : ''}`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                autoComplete="name" // Enable browser autocomplete for name
               />
               {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
@@ -120,11 +122,13 @@ const Buyer_signup = () => {
               <label className="form-label">Email address</label>
               <input
                 type="email"
+                name="email" // Add name attribute
                 placeholder="Your feast alerts inbox 📬"
                 className={`form-control shadow-none ${errors.email ? 'is-invalid' : ''}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email" // Enable browser autocomplete for email
               />
               {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
@@ -133,11 +137,13 @@ const Buyer_signup = () => {
               <label className="form-label">Create Password</label>
               <input
                 type="password"
+                name="password" // Add name attribute
                 placeholder="A tasty secret 🍯"
                 className={`form-control shadow-none ${errors.password ? 'is-invalid' : ''}`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="new-password" // Enable browser autocomplete for new password
               />
               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             </div>
@@ -146,11 +152,13 @@ const Buyer_signup = () => {
               <label className="form-label">Confirm Password</label>
               <input
                 type="password"
+                name="confirmPassword" // Add name attribute
                 placeholder="Repeat your tasty secret 🔒"
                 className={`form-control shadow-none ${errors.confirmPassword ? 'is-invalid' : ''}`}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                autoComplete="new-password" // Enable browser autocomplete for confirm password
               />
               {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
             </div>
@@ -165,11 +173,13 @@ const Buyer_signup = () => {
               <label className="form-label">Enter OTP</label>
               <input
                 type="text"
+                name="otp" // Add name attribute
                 placeholder="Check your food inbox! 🍗"
                 className={`form-control shadow-none ${errors.otp ? 'is-invalid' : ''}`}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 required
+                autoComplete="one-time-code" // Enable browser autocomplete for OTP
               />
               {errors.otp && <div className="invalid-feedback">{errors.otp}</div>}
             </div>
@@ -181,7 +191,7 @@ const Buyer_signup = () => {
         )}
 
         <p className="text-center mt-3">
-          Already a foodie? <a href="/buyer-signin" className="text-warning">Login to Eat</a>
+          Already a foodie? <a href="/buyer-signin" className="text-warning">Sign in to Eat</a>
         </p>
       </div>
     </div>

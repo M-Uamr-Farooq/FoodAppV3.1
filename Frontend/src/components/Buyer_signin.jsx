@@ -70,11 +70,13 @@ const Buyer_signin = () => {
             <label className="form-label">Email address</label>
             <input
               type="email"
+              name="email" // Add name attribute
               placeholder="Your food delivery inbox 📬"
               className="form-control shadow-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email" // Enable browser autocomplete for email
             />
           </div>
 
@@ -82,11 +84,13 @@ const Buyer_signin = () => {
             <label className="form-label">Password</label>
             <input
               type="password"
+              name="password" // Add name attribute
               placeholder="Secret sauce password 🍯"
               className="form-control shadow-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password" // Enable browser autocomplete for password
             />
           </div>
 
