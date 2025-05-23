@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const buyer = JSON.parse(localStorage.getItem('buyer'));
   const cartKey = buyer ? `cartItems_${buyer.email}` : 'cartItems_guest';
   const [cartItems, setCartItems] = useState([]);
@@ -24,24 +26,39 @@ const Cart = () => {
     setShowModal(true);
   };
 
-  const handleOrderSubmit = () => {
-    // Validate the inputs
+  const handleOrderSubmit = async () => {
     if (!name || !phone || !address) {
       alert('Please fill in all the details.');
       return;
     }
 
-    // Construct URL parameters
-    const params = new URLSearchParams();
-    params.append('name', name);
-    params.append('phone', phone);
-    params.append('address', address);
-    cartItems.forEach(item => {
-      params.append('items', JSON.stringify(item));
-    });
+    const orderData = {
+      name,
+      phone,
+      address,
+      time: new Date().toLocaleString(),
+      items: cartItems,
+      restaurantName: cartItems[0]?.restaurant_name || "",
+    };
 
-    // Redirect to the Order page with the parameters
-    window.location.href = `/order?${params.toString()}`;
+    try {
+      const res = await fetch('http://localhost:3000/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+      if (res.ok) {
+        setShowModal(false);
+        setCartItems([]);
+        localStorage.removeItem(cartKey);
+        // Pass orderData to Order page using state
+        navigate('/order', { state: orderData });
+      } else {
+        alert('Failed to place order. Please try again.');
+      }
+    } catch (err) {
+      alert('Error placing order. Please try again.');
+    }
   };
 
   const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);

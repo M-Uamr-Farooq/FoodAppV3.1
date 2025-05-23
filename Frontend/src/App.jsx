@@ -12,14 +12,13 @@ import YourRestaurantAuth from "./components/YourRestaurantAuth";
 import YourRestaurant from "./components/YourRestaurant";
 import Cart from "./components/Cart";
 import Order from "./components/Order";
-import Ordered from "./components/Ordered";
-
+import RestaurantOrders from "./components/RestaurantOrders";
 
 function App() {
   return (
     <Router>
       {/* Navbar always visible */}
-      <Navbar/>
+      <Navbar />
 
       {/* Main content */}
       <div className="">
@@ -34,7 +33,7 @@ function App() {
           <Route path="/your-restaurant" element={<YourRestaurant />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order" element={<Order />} />
-          <Route path="/ordered" element={<Ordered />} />
+          <Route path="/restaurant-orders" element={<RestaurantOrders />} />
         </Routes>
       </div>
     </Router>

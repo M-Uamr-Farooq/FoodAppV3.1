@@ -10,6 +10,9 @@ const buyerAuthRoutes = require('./routes/buyerAuthRoutes');
 const restaurantAuthRoutes = require('./routes/restaurantAuthRoutes');
 const otpRoutes = require('./routes/otpRoutes');
 
+const orderRoutes = require('./routes/order');
+
+
 const app = express();
 
 app.use(cors());
@@ -20,5 +23,6 @@ app.use('/api/menu', menuRoutes); // <-- Add this line
 app.use('/api', buyerAuthRoutes);
 app.use('/api', restaurantAuthRoutes);
 app.use('/api', otpRoutes);
+app.use('/api', orderRoutes);
 
 app.listen(3000, () => console.log('🚀 Server running at http://localhost:3000'));

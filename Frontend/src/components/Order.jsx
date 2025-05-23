@@ -1,15 +1,23 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Order = () => {
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
+  const navigate = useNavigate();
+  const order = location.state;
 
-  const name = params.get('name');
-  const phone = params.get('phone');
-  const address = params.get('address');
-  const items = params.getAll('items').map(item => JSON.parse(item));
+  if (!order) {
+    // If accessed directly, redirect to home or show a message
+    return (
+      <div className="container py-5">
+        <div className="alert alert-warning text-center">
+          No order found. <button className="btn btn-link" onClick={() => navigate('/')}>Go Home</button>
+        </div>
+      </div>
+    );
+  }
 
+  const { name, phone, address, items } = order;
   const total = items.reduce((sum, item) => sum + Number(item.price), 0);
 
   return (

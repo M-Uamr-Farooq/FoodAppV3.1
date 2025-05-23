@@ -108,14 +108,21 @@ export default function Navbar() {
             )}
 
             {showEditProfile && (
-              <li className="nav-item">
-                <button
-                  className="btn custom-edit-btn ms-2"
-                  onClick={() => setShowEdit(true)}
-                >
-                  <i className="bi bi-gear me-1"></i> Edit Profile
-                </button>
-              </li>
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" to="/restaurant-orders">
+                    <i className="bi bi-receipt-cutoff me-1"></i> Orders
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn custom-edit-btn ms-2"
+                    onClick={() => setShowEdit(true)}
+                  >
+                    <i className="bi bi-gear me-1"></i> Edit Profile
+                  </button>
+                </li>
+              </>
             )}
           </ul>
         </div>
