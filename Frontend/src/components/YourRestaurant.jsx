@@ -154,7 +154,7 @@ const YourRestaurant = () => {
                 </div>
                 <div className="col-12 col-md-1 d-grid">
                   <button type="submit" className="btn btn-success">
-                    <i className="bi bi-plus-lg"></i>
+                    Add
                   </button>
                 </div>
               </div>

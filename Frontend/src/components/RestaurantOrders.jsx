@@ -7,6 +7,7 @@ const RestaurantOrders = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,11 +22,14 @@ const RestaurantOrders = () => {
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
+        setError('');
         const res = await axios.get(
           `http://localhost:3000/api/orders/${encodeURIComponent(data.name)}`
         );
         setOrders(res.data);
-      } catch {}
+      } catch (err) {
+        setError('Failed to fetch orders.');
+      }
       setIsLoading(false);
     };
     fetchOrders();
@@ -63,17 +67,20 @@ const RestaurantOrders = () => {
       {actionMsg && (
         <div className="alert alert-info text-center">{actionMsg}</div>
       )}
+      {error && (
+        <div className="alert alert-danger text-center">{error}</div>
+      )}
       {orders.length === 0 ? (
         <div className="alert alert-info text-center">No orders yet.</div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 g-4">
           {orders.map((order, idx) => (
-            <div key={idx} className="col">
+            <div key={order.id || idx} className="col">
               <div className="card border-0 shadow-sm h-100 rounded-3">
                 <div className="card-body">
                   <div className="d-flex align-items-center mb-2">
                     <i className="bi bi-person-circle fs-4 text-primary me-2"></i>
-                    <span className="fw-bold">{order.name}</span>
+                    <span className="fw-bold">{order.buyer_name || order.name}</span>
                   </div>
                   <div className="mb-1">
                     <i className="bi bi-geo-alt text-danger me-1"></i>
@@ -81,22 +88,16 @@ const RestaurantOrders = () => {
                   </div>
                   <div className="mb-1">
                     <i className="bi bi-telephone text-success me-1"></i>
-                    <strong>Phone:</strong> {order.phone}
+                    <strong>Phone:</strong> {order.contact || order.phone}
                   </div>
                   <div className="mb-1">
                     <i className="bi bi-clock text-secondary me-1"></i>
-                    <strong>Time:</strong> {order.time}
+                    <strong>Time:</strong> {order.created_at || order.time}
                   </div>
-                  <div className="mt-2">
-                    <strong>Items:</strong>
-                    <ul className="mb-0">
-                      {order.items.map((item, i) => (
-                        <li key={i}>
-                          <span className="badge bg-warning text-dark me-2">{item.item_name}</span>
-                          <span className="text-success">Rs {item.price}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="mt-3">
+                    <span className="badge bg-info text-dark fs-6">
+                      Total: Rs {order.total}
+                    </span>
                   </div>
                   <button
                     className="btn btn-outline-danger btn-sm mt-3 w-100"

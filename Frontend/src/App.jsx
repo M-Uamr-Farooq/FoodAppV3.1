@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar"; // adjust path if needed
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // Import all your pages here
 import Home from "./components/Home";
@@ -17,24 +18,27 @@ import RestaurantOrders from "./components/RestaurantOrders";
 function App() {
   return (
     <Router>
-      {/* Navbar always visible */}
-      <Navbar />
-
-      {/* Main content */}
-      <div className="">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/Home" element={<Home />} />
-          <Route path="/buyer-signin" element={<Buyer_signin />} />
-          <Route path="/buyer-signup" element={<Buyer_signup />} />
-          <Route path="/register-restaurant" element={<RegisterRestaurant />} />
-          <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/your-restaurant-auth" element={<YourRestaurantAuth />} />
-          <Route path="/your-restaurant" element={<YourRestaurant />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/order" element={<Order />} />
-          <Route path="/restaurant-orders" element={<RestaurantOrders />} />
-        </Routes>
+      <div className="d-flex flex-column min-vh-100">
+        <Navbar />
+        <div className="flex-grow-1">
+          {/* Main content */}
+          <div className="">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/Home" element={<Home />} />
+              <Route path="/buyer-signin" element={<Buyer_signin />} />
+              <Route path="/buyer-signup" element={<Buyer_signup />} />
+              <Route path="/register-restaurant" element={<RegisterRestaurant />} />
+              <Route path="/verify-otp" element={<VerifyOtp />} />
+              <Route path="/your-restaurant-auth" element={<YourRestaurantAuth />} />
+              <Route path="/your-restaurant" element={<YourRestaurant />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/order" element={<Order />} />
+              <Route path="/restaurant-orders" element={<RestaurantOrders />} />
+            </Routes>
+          </div>
+        </div>
+        <Footer />
       </div>
     </Router>
   );

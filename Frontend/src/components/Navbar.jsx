@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/Navbar.css"; // Updated CSS for custom styles
+import "../styles/Navbar.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Navbar() {
@@ -9,22 +9,35 @@ export default function Navbar() {
   const navigate = useNavigate();
   const path = location.pathname;
 
-  const isLoggedIn = localStorage.getItem("buyer") !== null;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isBuyer = !!localStorage.getItem("buyer");
+  const isRestaurant = !!sessionStorage.getItem("restaurant");
   const [showEdit, setShowEdit] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [orderCount, setOrderCount] = useState(0);
 
+  // Show full nav on home
   const showFullNav = path === "/home" || path === "/";
-  const showOnlyHome = [
-    "/register-restaurant",
-    "/your-restaurant-auth",
+  // Show Home and Orders for restaurant dashboard and order pages
+  const showRestaurantNav = [
     "/your-restaurant",
-    "/cart",
     "/order",
-    "/ordered",
-    "/buyer-signin",
-    "/buyer-signup",
+    "/restaurant-orders",
+    "/cart",
   ].includes(path);
-  const showEditProfile = path === "/your-restaurant";
+
+  // Fetch order count for restaurant
+  useEffect(() => {
+    if (isRestaurant) {
+      const stored = sessionStorage.getItem("restaurant");
+      if (stored) {
+        const { name } = JSON.parse(stored);
+        fetch(`http://localhost:3000/api/orders/${encodeURIComponent(name)}`)
+          .then((res) => res.json())
+          .then((data) => setOrderCount(Array.isArray(data) ? data.length : 0))
+          .catch(() => setOrderCount(0));
+      }
+    }
+  }, [isRestaurant, path]);
 
   const handleSignOut = () => {
     localStorage.removeItem("buyer");
@@ -33,8 +46,10 @@ export default function Navbar() {
     window.location.reload();
   };
 
+  const handleMenuToggle = () => setIsMenuOpen((prev) => !prev);
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light navbar-custom">
+    <nav className="navbar navbar-expand-lg navbar-light navbar-custom shadow-sm">
       <div className="container">
         {/* Logo */}
         <Link className="navbar-brand fw-bold fs-6" to="/home">
@@ -45,38 +60,37 @@ export default function Navbar() {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
           aria-controls="navbarNav"
-          aria-expanded="false"
+          aria-expanded={isMenuOpen}
           aria-label="Toggle navigation"
+          onClick={handleMenuToggle}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Desktop Menu */}
-        <div className="collapse navbar-collapse" id="navbarNav">
+        {/* Menu */}
+        <div className={`collapse navbar-collapse${isMenuOpen ? " show" : ""}`} id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">
             {showFullNav && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link fw-semibold" to="/register-restaurant">
+                  <Link className="nav-link fw-semibold" to="/register-restaurant" onClick={() => setIsMenuOpen(false)}>
                     <i className="bi bi-shop me-1"></i> Register Restaurant
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link fw-semibold" to="/your-restaurant-auth">
+                  <Link className="nav-link fw-semibold" to="/your-restaurant-auth" onClick={() => setIsMenuOpen(false)}>
                     <i className="bi bi-pencil-square me-1"></i> Your Restaurant
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link fw-semibold" to="/cart">
+                  <Link className="nav-link fw-semibold" to="/cart" onClick={() => setIsMenuOpen(false)}>
                     <i className="bi bi-cart me-1"></i> Cart
                   </Link>
                 </li>
-                {!isLoggedIn ? (
+                {!isBuyer ? (
                   <li className="nav-item">
-                    <Link className="nav-link fw-semibold" to="/buyer-signin">
+                    <Link className="nav-link fw-semibold" to="/buyer-signin" onClick={() => setIsMenuOpen(false)}>
                       <i className="bi bi-box-arrow-in-right me-1"></i> Sign In
                     </Link>
                   </li>
@@ -90,38 +104,71 @@ export default function Navbar() {
               </>
             )}
 
-            {showOnlyHome && (
+            {/* Only show Home, Your Restaurant, and Sign Out on /restaurant-orders */}
+            {path === "/restaurant-orders" && isRestaurant && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link fw-semibold" to="/home">
+                  <Link className="nav-link fw-semibold" to="/home" onClick={() => setIsMenuOpen(false)}>
                     <i className="bi bi-house-door me-1"></i> Home
                   </Link>
                 </li>
-                {isLoggedIn && (
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" to="/your-restaurant" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-shop me-1"></i> Your Restaurant
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn custom-signout-btn ms-2" onClick={handleSignOut}>
+                    <i className="bi bi-box-arrow-left me-1"></i> Sign Out
+                  </button>
+                </li>
+              </>
+            )}
+
+            {/* Show restaurant nav for other pages except /restaurant-orders */}
+            {showRestaurantNav && path !== "/restaurant-orders" && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link fw-semibold" to="/home" onClick={() => setIsMenuOpen(false)}>
+                    <i className="bi bi-house-door me-1"></i> Home
+                  </Link>
+                </li>
+                {isRestaurant && (
+                  <>
+                    <li className="nav-item">
+                      <Link className="nav-link fw-semibold position-relative" to="/restaurant-orders" onClick={() => setIsMenuOpen(false)}>
+                        <i className="bi bi-receipt-cutoff me-1"></i> Orders
+                        {orderCount > 0 && (
+                          <span
+                            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            {orderCount}
+                            <span className="visually-hidden">unread orders</span>
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <button
+                        className="btn custom-edit-btn ms-2"
+                        onClick={() => {
+                          setShowEdit(true);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <i className="bi bi-gear me-1"></i> Edit Profile
+                      </button>
+                    </li>
+                  </>
+                )}
+                {(isBuyer || isRestaurant) && (
                   <li className="nav-item">
-                    <button className="btn custom-signout-btn" onClick={handleSignOut}>
+                    <button className="btn custom-signout-btn ms-2" onClick={handleSignOut}>
                       <i className="bi bi-box-arrow-left me-1"></i> Sign Out
                     </button>
                   </li>
                 )}
-              </>
-            )}
-
-            {showEditProfile && (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link fw-semibold" to="/restaurant-orders">
-                    <i className="bi bi-receipt-cutoff me-1"></i> Orders
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <button
-                    className="btn custom-edit-btn ms-2"
-                    onClick={() => setShowEdit(true)}
-                  >
-                    <i className="bi bi-gear me-1"></i> Edit Profile
-                  </button>
-                </li>
               </>
             )}
           </ul>
