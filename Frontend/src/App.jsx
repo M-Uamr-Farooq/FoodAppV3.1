@@ -14,6 +14,7 @@ import YourRestaurant from "./components/YourRestaurant";
 import Cart from "./components/Cart";
 import Order from "./components/Order";
 import RestaurantOrders from "./components/RestaurantOrders";
+import Delivered from "./components/Delivered";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/order" element={<Order />} />
               <Route path="/restaurant-orders" element={<RestaurantOrders />} />
+              <Route path="/delivered" element={<Delivered />} />
             </Routes>
           </div>
         </div>

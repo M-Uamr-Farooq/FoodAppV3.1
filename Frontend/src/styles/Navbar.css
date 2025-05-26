@@ -47,3 +47,49 @@
 .navbar-brand i {
   font-size: 1.1rem;
 }
+
+/* Tooltip container */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Tooltip text */
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 160px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  position: absolute;
+  top: 125%; /* Position below the link */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip arrow */
+.tooltip-container .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%; /* Arrow points up */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* Show tooltip on hover */
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(5px); /* Slight movement effect */
+}

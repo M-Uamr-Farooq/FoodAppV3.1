@@ -9,9 +9,9 @@ const menuRoutes = require('./routes/menuRoutes'); // <-- Add this line
 const buyerAuthRoutes = require('./routes/buyerAuthRoutes');
 const restaurantAuthRoutes = require('./routes/restaurantAuthRoutes');
 const otpRoutes = require('./routes/otpRoutes');
-
 const orderRoutes = require('./routes/order');
-
+const notificationRoutes = require('./routes/notificationRoutes');
+const deliveryRoutes = require('./routes/deliveryRoutes');
 
 const app = express();
 
@@ -24,5 +24,9 @@ app.use('/api', buyerAuthRoutes);
 app.use('/api', restaurantAuthRoutes);
 app.use('/api', otpRoutes);
 app.use('/api', orderRoutes);
+app.use('/api', notificationRoutes);
+app.use('/api', deliveryRoutes);
+
+// ...other routes and server setup...
 
 app.listen(3000, () => console.log('🚀 Server running at http://localhost:3000'));

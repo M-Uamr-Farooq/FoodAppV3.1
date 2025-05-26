@@ -1,110 +1,93 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "./LoadingSpinner";
 
 const RestaurantOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [actionMsg, setActionMsg] = useState('');
-  const [error, setError] = useState('');
+  const [actionMsg, setActionMsg] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('restaurant');
+    const stored = sessionStorage.getItem("restaurant");
     if (!stored) {
-      navigate('/your-restaurant-auth');
+      navigate("/your-restaurant-auth");
       return;
     }
     const data = JSON.parse(stored);
-    setRestaurant(data);
 
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
-        setError('');
+        setError("");
         const res = await axios.get(
           `http://localhost:3000/api/orders/${encodeURIComponent(data.name)}`
         );
         setOrders(res.data);
       } catch (err) {
-        setError('Failed to fetch orders.');
+        setError("Failed to fetch orders.");
       }
       setIsLoading(false);
     };
     fetchOrders();
+  }, [navigate]);
 
-    const interval = setInterval(fetchOrders, 30000);
-    return () => clearInterval(interval);
-  }, [navigate, actionMsg]);
-
-  const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm('Mark this order as dispatched and remove it?')) return;
+  const handleMarkAsDispatched = async (orderId) => {
+    if (!window.confirm("Mark this order as dispatched?")) return;
     try {
-      await axios.delete(`http://localhost:3000/api/orders/${orderId}`);
-      setOrders(orders.filter(order => order.id !== orderId));
-      setActionMsg('Order removed!');
+      await axios.patch(`http://localhost:3000/api/orders/${orderId}`, {
+        status: "dispatched",
+      });
+      setOrders(
+        orders.map((order) =>
+          order.id === orderId ? { ...order, status: "dispatched" } : order
+        )
+      );
+      setActionMsg("Order marked as dispatched!");
     } catch {
-      setActionMsg('Failed to remove order');
+      setActionMsg("Failed to update order status");
     }
-    setTimeout(() => setActionMsg(''), 2000);
+    setTimeout(() => setActionMsg(""), 2000);
   };
 
   if (isLoading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="spinner-border text-warning" role="status"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="container py-4">
-      <h2 className="text-center mb-4 text-warning">
-        <i className="bi bi-receipt-cutoff me-2"></i>
-        Orders for {restaurant?.name}
+    <div className="container py-5">
+      <h2 className="text-center text-warning mb-4">
+        <i className="bi bi-receipt-cutoff me-2"></i> Orders for Your Restaurant
       </h2>
       {actionMsg && (
         <div className="alert alert-info text-center">{actionMsg}</div>
       )}
-      {error && (
-        <div className="alert alert-danger text-center">{error}</div>
-      )}
+      {error && <div className="alert alert-danger text-center">{error}</div>}
       {orders.length === 0 ? (
         <div className="alert alert-info text-center">No orders yet.</div>
       ) : (
-        <div className="row row-cols-1 row-cols-md-2 g-4">
+        <div className="row g-4">
           {orders.map((order, idx) => (
-            <div key={order.id || idx} className="col">
-              <div className="card border-0 shadow-sm h-100 rounded-3">
+            <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
+              <div className="card h-100 shadow-lg border-0">
                 <div className="card-body">
-                  <div className="d-flex align-items-center mb-2">
-                    <i className="bi bi-person-circle fs-4 text-primary me-2"></i>
-                    <span className="fw-bold">{order.buyer_name || order.name}</span>
-                  </div>
-                  <div className="mb-1">
-                    <i className="bi bi-geo-alt text-danger me-1"></i>
+                  <h5 className="card-title text-primary">{order.buyer_name}</h5>
+                  <p>
                     <strong>Address:</strong> {order.address}
-                  </div>
-                  <div className="mb-1">
-                    <i className="bi bi-telephone text-success me-1"></i>
-                    <strong>Phone:</strong> {order.contact || order.phone}
-                  </div>
-                  <div className="mb-1">
-                    <i className="bi bi-clock text-secondary me-1"></i>
-                    <strong>Time:</strong> {order.created_at || order.time}
-                  </div>
-                  <div className="mt-3">
-                    <span className="badge bg-info text-dark fs-6">
-                      Total: Rs {order.total}
-                    </span>
-                  </div>
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {order.phone}
+                  </p>
+                  <p>
+                    <strong>Total:</strong> Rs {order.total}
+                  </p>
                   <button
-                    className="btn btn-outline-danger btn-sm mt-3 w-100"
-                    onClick={() => handleDeleteOrder(order.id)}
+                    className="btn btn-success w-100 mt-3"
+                    onClick={() => handleMarkAsDispatched(order.id)}
                   >
-                    <i className="bi bi-check2-circle me-1"></i>
-                    Mark as Dispatched & Remove
+                    <i className="bi bi-truck me-2"></i>Mark as Dispatched
                   </button>
                 </div>
               </div>

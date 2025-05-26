@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CashOnDeliveryMessage from "./CashOnDeliveryMessage";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -74,10 +75,11 @@ const Cart = () => {
   const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
 
   return (
-    <div className="container py-5">
-      <h2 className="text-center text-danger mb-4">
-        <i className="bi bi-cart4 me-2"></i>Your Cart
+    <div className="container py-4">
+      <h2 className="text-center text-warning mb-4">
+        <i className="bi bi-cart me-2"></i>Your Cart
       </h2>
+      <CashOnDeliveryMessage />
       {cartItems.length === 0 ? (
         <div className="alert alert-warning text-center shadow-sm rounded-3">
           <i className="bi bi-emoji-frown me-2"></i>Your cart is empty.
@@ -86,7 +88,7 @@ const Cart = () => {
         <div className="row g-4">
           {cartItems.map((item, idx) => (
             <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
-              <div className="card h-100 shadow border-0 rounded-4">
+              <div className="card h-100 shadow-lg border-0">
                 <img
                   src={item.image}
                   className="card-img-top"
@@ -94,23 +96,19 @@ const Cart = () => {
                   style={{
                     height: "200px",
                     objectFit: "cover",
-                    borderRadius: "18px 18px 0 0",
+                    borderRadius: "10px",
                   }}
                 />
-                <div className="card-body text-center d-flex flex-column">
-                  <h5 className="card-title text-primary fw-bold">{item.item_name}</h5>
-                  <p className="text-muted mb-1">
-                    <i className="bi bi-shop me-1"></i>
-                    <strong>{item.restaurant_name}</strong>
-                  </p>
+                <div className="card-body text-center">
+                  <h5 className="card-title text-primary">{item.item_name}</h5>
                   <p className="text-success fw-bold mb-3 fs-5">
                     Rs {Number(item.price).toFixed(2)}
                   </p>
                   <button
-                    className="btn btn-outline-danger mt-auto w-100"
-                    onClick={() => handleRemove(idx)}
+                    className="btn btn-danger w-100 mb-2"
+                    onClick={() => handleRemove(item.id)}
                   >
-                    <i className="bi bi-trash me-1"></i> Remove
+                    <i className="bi bi-trash me-2"></i>Remove
                   </button>
                 </div>
               </div>

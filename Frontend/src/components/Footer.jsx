@@ -3,27 +3,26 @@ import React from "react";
 export default function Footer() {
   return (
     <footer
-      className="footer mt-auto py-4"
+      className="footer mt-auto py-2" // Reduced vertical padding (py-2)
       style={{
         background: "linear-gradient(90deg, #ff7043 0%, #ffcc33 100%)",
-        borderTop: "4px solid #ff7043",
+        // Removed red border on top by omitting borderTop
         color: "#ffffff",
         fontFamily: "'Quicksand', 'Segoe UI', sans-serif",
         letterSpacing: "0.5px",
-        boxShadow: "0 -2px 12px rgba(255, 112, 67, 0.2)",
       }}
     >
       <div className="container text-center">
         {/* Food Emoji */}
-        <div className="mb-3">
-          <span style={{ fontSize: "2.5rem" }} role="img" aria-label="food">
+        <div className="mb-2">
+          <span style={{ fontSize: "2rem" }} role="img" aria-label="food">
             🍕🍔🍟🍜
           </span>
         </div>
 
         {/* Brand Name */}
         <h5
-          className="fw-bold mb-3"
+          className="fw-bold mb-2"
           style={{
             fontFamily: "'Pacifico', cursive",
             color: "#ffffff",
@@ -35,11 +34,11 @@ export default function Footer() {
 
         {/* Tagline */}
         <p
-          className="mb-3"
+          className="mb-2"
           style={{
             color: "#ffffff",
             fontWeight: 500,
-            fontSize: "1rem",
+            fontSize: "0.95rem",
             textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
           }}
         >
@@ -47,15 +46,15 @@ export default function Footer() {
         </p>
 
         {/* Social Media Links */}
-        <div className="mb-3">
+        <div className="mb-2">
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mx-3 text-decoration-none"
+            className="mx-2 text-decoration-none"
             style={{
               color: "#ffffff",
-              fontSize: "1.5rem",
+              fontSize: "1.4rem",
               transition: "color 0.3s",
             }}
           >
@@ -65,10 +64,10 @@ export default function Footer() {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mx-3 text-decoration-none"
+            className="mx-2 text-decoration-none"
             style={{
               color: "#ffffff",
-              fontSize: "1.5rem",
+              fontSize: "1.4rem",
               transition: "color 0.3s",
             }}
           >
@@ -76,10 +75,10 @@ export default function Footer() {
           </a>
           <a
             href="mailto:support@foodiehaven.com"
-            className="mx-3 text-decoration-none"
+            className="mx-2 text-decoration-none"
             style={{
               color: "#ffffff",
-              fontSize: "1.5rem",
+              fontSize: "1.4rem",
               transition: "color 0.3s",
             }}
           >
@@ -90,7 +89,7 @@ export default function Footer() {
         {/* Copyright */}
         <div
           style={{
-            fontSize: "0.9rem",
+            fontSize: "0.85rem",
             color: "#ffe0b2",
           }}
         >
