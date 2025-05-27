@@ -171,7 +171,8 @@ export default function Home() {
               item.restaurant_name.toLowerCase().includes(search.toLowerCase())
           )
           .map((item, idx) => (
-            <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
+            <div key={idx} className="col-12 col-sm-6 col-md-4 col-lg-3">
+
               <div
                 className="card h-100 shadow-lg border-0 menu-item-card"
                 style={{

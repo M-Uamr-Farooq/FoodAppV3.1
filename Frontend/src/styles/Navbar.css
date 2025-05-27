@@ -93,3 +93,52 @@
   opacity: 1;
   transform: translateX(-50%) translateY(5px); /* Slight movement effect */
 }
+
+/* Navbar.css */
+
+/* Ensure nav-links appear modern */
+.navbar-nav .nav-link {
+  color: #fff !important;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+/* Add transition for collapse menu items */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    transition: max-height 0.5s ease-in-out;
+    overflow: hidden;
+  }
+
+  .navbar-collapse.show {
+    max-height: 500px; /* Enough to fit all items */
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+
+  .navbar-nav .nav-item {
+    padding: 0.3rem 1rem;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  .navbar-collapse.show .nav-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: Smooth button appearance */
+.navbar-nav .btn-link {
+  color: #fff !important;
+  text-align: left;
+  padding-left: 0;
+}

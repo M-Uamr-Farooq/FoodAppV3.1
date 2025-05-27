@@ -3,7 +3,7 @@ import React from "react";
 export default function Footer() {
   return (
     <footer
-      className="footer mt-auto py-2" // Reduced vertical padding (py-2)
+      className="footer mt-auto pt-5 pt-xxl-2 " 
       style={{
         background: "linear-gradient(90deg, #ff7043 0%, #ffcc33 100%)",
         // Removed red border on top by omitting borderTop

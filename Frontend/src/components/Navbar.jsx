@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../styles/Navbar.css";
+import "../styles/Navbar.css"; // Make sure this file doesn't override Bootstrap navbar behavior
 
 export default function Navbar() {
   const location = useLocation();
@@ -66,31 +66,35 @@ export default function Navbar() {
           aria-controls="navbarNav"
           aria-expanded="false"
           aria-label="Toggle navigation"
-          style={{ padding: "0.15rem 0.5rem" }}
         >
-          <span className="navbar-toggler-icon" style={{ height: "1.2em" }}></span>
+          <span className="navbar-toggler-icon"></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center gap-lg-2">
-            {/* Common Links (Home, Sign Out/Sign In) */}
+          <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-2 py-2 py-lg-0">
             {(currentRoute === "/" || currentRoute === "/home") && (
               <>
-
                 <li className="nav-item">
                   <Link className="nav-link" to="/cart" style={linkStyle}>
                     <i className="bi bi-cart4 me-1"></i> Cart
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to={isRestaurant ? "/your-restaurant" : "/register-restaurant"} style={linkStyle}>
+                  <Link
+                    className="nav-link"
+                    to={isRestaurant ? "/your-restaurant" : "/register-restaurant"}
+                    style={linkStyle}
+                  >
                     <i className="bi bi-shop me-1"></i> {isRestaurant ? "My Restaurant" : "Register Restaurant"}
                   </Link>
                 </li>
-
                 {isBuyer || isRestaurant ? (
                   <li className="nav-item">
-                    <button className="nav-link btn btn-link" onClick={handleSignOut} style={{ ...linkStyle, textDecoration: "none" }}>
+                    <button
+                      className="nav-link btn btn-link"
+                      onClick={handleSignOut}
+                      style={{ ...linkStyle, textDecoration: "none" }}
+                    >
                       <i className="bi bi-box-arrow-right me-1"></i> Sign Out
                     </button>
                   </li>
@@ -106,7 +110,6 @@ export default function Navbar() {
 
             {currentRoute === "/your-restaurant" && (
               <>
-
                 <li className="nav-item">
                   <Link className="nav-link" to="/home" style={linkStyle}>
                     <i className="bi bi-house-door me-1"></i> Home
@@ -127,7 +130,6 @@ export default function Navbar() {
                     <i className="bi bi-truck me-1"></i> Delivered
                   </Link>
                 </li>
-
               </>
             )}
 
@@ -139,28 +141,29 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link btn btn-link" onClick={handleSignOut} style={{ ...linkStyle, textDecoration: "none" }}>
+                  <button
+                    className="nav-link btn btn-link"
+                    onClick={handleSignOut}
+                    style={{ ...linkStyle, textDecoration: "none" }}
+                  >
                     <i className="bi bi-box-arrow-right me-1"></i> Sign Out
                   </button>
                 </li>
-
               </>
             )}
 
             {currentRoute === "/delivered" && (
               <>
-
-              <li className="nav-item">
+                <li className="nav-item">
                   <Link className="nav-link" to="/home" style={linkStyle}>
                     <i className="bi bi-house-door me-1"></i> Home
                   </Link>
-                </li > 
+                </li>
                 <li className="nav-item">
                   <Link className="nav-link" to="/your-restaurant" style={linkStyle}>
                     <i className="bi bi-shop me-1"></i> My Restaurant
                   </Link>
                 </li>
-               
               </>
             )}
 
@@ -180,16 +183,12 @@ export default function Navbar() {
             )}
 
             {currentRoute === "/your-restaurant-auth" && (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/home" style={linkStyle}>
-                    <i className="bi bi-house-door me-1"></i> Home
-                  </Link>
-                </li>
-
-              </>
+              <li className="nav-item">
+                <Link className="nav-link" to="/home" style={linkStyle}>
+                  <i className="bi bi-house-door me-1"></i> Home
+                </Link>
+              </li>
             )}
-
 
             {currentRoute === "/restaurant-orders" && (
               <>
@@ -203,7 +202,6 @@ export default function Navbar() {
                     <i className="bi bi-shop me-1"></i> My Restaurant
                   </Link>
                 </li>
-
               </>
             )}
           </ul>
