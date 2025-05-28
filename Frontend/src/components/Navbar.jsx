@@ -204,6 +204,16 @@ export default function Navbar() {
                 </li>
               </>
             )}
+
+            {currentRoute === "/order" && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/home" style={linkStyle}>
+                    <i className="bi bi-house-door me-1"></i> Home
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

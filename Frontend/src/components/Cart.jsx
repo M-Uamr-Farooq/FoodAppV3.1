@@ -43,13 +43,14 @@ const Cart = () => {
 
     const orderData = {
       buyer_name: name,
-      buyer_email: "", // Always empty, not used
       address,
       contact: phone,
       total,
-      items: cartItems,
-      restaurantName: cartItems[0]?.restaurant_name || "",
+      status: 'Placed',
+      restaurantName: cartItems[0]?.restaurant_name || "Unknown Restaurant",
     };
+
+    console.log("Submitting order data:", orderData);
 
     try {
       const res = await fetch('http://localhost:3000/api/order', {
@@ -57,19 +58,25 @@ const Cart = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
       });
+
       if (res.ok) {
-        setShowModal(false);
+        const data = await res.json();
+        alert(data.message || 'Order placed successfully!');
         setCartItems([]);
         localStorage.removeItem(cartKey);
-        navigate('/order', { state: orderData });
+
+        // Navigate to the Order page with the order details
+        navigate('/order', { state: data });
       } else {
         const data = await res.json();
         alert(data.message || 'Failed to place order. Please try again.');
       }
     } catch (err) {
+      console.error('Error placing order:', err);
       alert('Error placing order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
@@ -106,7 +113,7 @@ const Cart = () => {
                   </p>
                   <button
                     className="btn btn-danger w-100 mb-2"
-                    onClick={() => handleRemove(item.id)}
+                    onClick={() => handleRemove(idx)} // Pass the correct index here
                   >
                     <i className="bi bi-trash me-2"></i>Remove
                   </button>

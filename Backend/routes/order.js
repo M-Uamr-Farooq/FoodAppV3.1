@@ -4,16 +4,37 @@ const db = require('../config/db');
 
 // CREATE order
 router.post('/order', (req, res) => {
-  const { buyer_name, address, contact, total, items, restaurantName } = req.body;
+  const { buyer_name, address, contact, total, status = 'Placed', restaurantName } = req.body;
+
+  console.log('Received order:', { buyer_name, address, contact, total, status, restaurantName });
+
+  // Validate required fields
+  if (!buyer_name || !address || !contact || !total || !restaurantName) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  const createdAt = new Date(); // Get current timestamp
+
   db.query(
-    'INSERT INTO orders (buyer_name, address, contact, total, items, restaurantName) VALUES (?, ?, ?, ?, ?, ?)',
-    [buyer_name, address, contact, total, JSON.stringify(items), restaurantName],
+    'INSERT INTO orders (buyer_name, address, contact, total, status, restaurantName, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [buyer_name, address, contact, total, status, restaurantName, createdAt],
     (err, result) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Failed to save order.' });
+        console.error("Database error:", err);
+        return res.status(500).json({ message: 'Failed to place order.' });
       }
-      res.json({ message: 'Order received!', id: result.insertId });
+
+      // Send back the order details, including order ID, timestamp, and restaurant name
+      res.json({
+        message: 'Order placed successfully!',
+        id: result.insertId,
+        name: buyer_name,
+        phone: contact,
+        address,
+        total,
+        restaurantName,
+        createdAt,
+      });
     }
   );
 });
