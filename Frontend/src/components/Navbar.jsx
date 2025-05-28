@@ -115,11 +115,7 @@ export default function Navbar() {
                     <i className="bi bi-house-door me-1"></i> Home
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/edit-profile" style={linkStyle}>
-                    <i className="bi bi-pencil-square me-1"></i> Edit Profile
-                  </Link>
-                </li>
+                
                 <li className="nav-item">
                   <Link className="nav-link" to="/restaurant-orders" style={linkStyle}>
                     <i className="bi bi-list-check me-1"></i> Orders
