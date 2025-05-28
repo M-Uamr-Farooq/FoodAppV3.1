@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const orderController = require('../controllers/orderController');
 
 // CREATE order
 router.post('/order', (req, res) => {
@@ -78,5 +79,8 @@ router.delete('/orders/:id', (req, res) => {
     res.json({ message: 'Order deleted.' });
   });
 });
+
+// Update order status
+router.patch('/orders/:id', orderController.updateOrderStatus);
 
 module.exports = router;

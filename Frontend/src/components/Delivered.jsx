@@ -14,8 +14,8 @@ const Delivered = () => {
       const { name } = JSON.parse(stored);
 
       try {
-        const res = await axios.get(`http://localhost:3000/api/deliveries/${encodeURIComponent(name)}`);
-        setDeliveries(res.data);
+        const res = await axios.get(`http://localhost:3000/api/orders/${encodeURIComponent(name)}`);
+        setDeliveries(res.data.filter((order) => order.status === 'dispatched'));
       } catch (err) {
         console.error('Failed to fetch deliveries:', err);
         setError('Failed to fetch deliveries.');
@@ -45,17 +45,36 @@ const Delivered = () => {
       {deliveries.length === 0 ? (
         <div className="alert alert-info text-center">No delivered orders yet.</div>
       ) : (
-        <div className="row row-cols-1 row-cols-md-2 g-4">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
           {deliveries.map((delivery, idx) => (
             <div key={delivery.id || idx} className="col">
-              <div className="card border-0 shadow-sm h-100 rounded-3">
-                <div className="card-body">
-                  <h5 className="card-title text-primary">{delivery.buyer_name}</h5>
-                  <p><strong>Address:</strong> {delivery.address}</p>
-                  <p><strong>Phone:</strong> {delivery.contact}</p>
-                  <p><strong>Total:</strong> Rs {delivery.total}</p>
-                  <p><strong>Delivery Person:</strong> {delivery.delivery_person}</p>
-                  <p><strong>Delivery Time:</strong> {new Date(delivery.delivery_time).toLocaleString()}</p>
+              <div
+                className="card border-0 shadow-sm h-100 rounded-3"
+                style={{
+                  backgroundColor: '#ffffff',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                }}
+              >
+                <div className="card-body p-2">
+                  <h6 className="card-title text-primary mb-2">{delivery.buyer_name}</h6>
+                  <p className="mb-1" style={{ fontSize: '0.85rem' }}>
+                    <strong>Address:</strong> {delivery.address}
+                  </p>
+                  <p className="mb-1" style={{ fontSize: '0.85rem' }}>
+                    <strong>Phone:</strong> {delivery.contact}
+                  </p>
+                  <p className="mb-1" style={{ fontSize: '0.85rem' }}>
+                    <strong>Total:</strong> Rs {delivery.total}
+                  </p>
+                  <p className="mb-1" style={{ fontSize: '0.85rem' }}>
+                    <strong>Delivery Person:</strong> {delivery.delivery_person || 'N/A'}
+                  </p>
+                  <p className="mb-1" style={{ fontSize: '0.85rem' }}>
+                    <strong>Delivery Time:</strong>{' '}
+                    {delivery.delivery_time
+                      ? new Date(delivery.delivery_time).toLocaleString()
+                      : 'N/A'}
+                  </p>
                   <span className="badge bg-success">{delivery.status}</span>
                 </div>
               </div>

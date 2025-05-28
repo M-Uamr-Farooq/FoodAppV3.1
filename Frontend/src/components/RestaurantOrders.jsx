@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
@@ -6,7 +6,6 @@ import LoadingSpinner from "./LoadingSpinner";
 const RestaurantOrders = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [actionMsg, setActionMsg] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -25,7 +24,7 @@ const RestaurantOrders = () => {
         const res = await axios.get(
           `http://localhost:3000/api/orders/${encodeURIComponent(data.name)}`
         );
-        setOrders(res.data);
+        setOrders(res.data.filter((order) => order.status !== "dispatched"));
       } catch (err) {
         setError("Failed to fetch orders.");
       }
@@ -35,21 +34,19 @@ const RestaurantOrders = () => {
   }, [navigate]);
 
   const handleMarkAsDispatched = async (orderId) => {
-    if (!window.confirm("Mark this order as dispatched?")) return;
     try {
+      // Optimistically remove the order from the UI
+      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
+
+      // Update the backend
       await axios.patch(`http://localhost:3000/api/orders/${orderId}`, {
-        status: "dispatched",
+        status: 'dispatched',
+        deliveryPerson: 'John Doe', // Replace with actual delivery person
       });
-      setOrders(
-        orders.map((order) =>
-          order.id === orderId ? { ...order, status: "dispatched" } : order
-        )
-      );
-      setActionMsg("Order marked as dispatched!");
-    } catch {
-      setActionMsg("Failed to update order status");
+    } catch (err) {
+      console.error('Error updating order status:', err.response?.data || err.message);
+      setError('Failed to update order status.');
     }
-    setTimeout(() => setActionMsg(""), 2000);
   };
 
   if (isLoading) {
@@ -58,12 +55,9 @@ const RestaurantOrders = () => {
 
   return (
     <div className="container py-5">
-      <h2 className="text-center text-warning mb-4">
+      <h2 className="text-center text-primary mb-4">
         <i className="bi bi-receipt-cutoff me-2"></i> Orders for Your Restaurant
       </h2>
-      {actionMsg && (
-        <div className="alert alert-info text-center">{actionMsg}</div>
-      )}
       {error && <div className="alert alert-danger text-center">{error}</div>}
       {orders.length === 0 ? (
         <div className="alert alert-info text-center">No orders yet.</div>
@@ -71,21 +65,33 @@ const RestaurantOrders = () => {
         <div className="row g-4">
           {orders.map((order, idx) => (
             <div key={idx} className="col-lg-4 col-md-6 col-sm-12">
-              <div className="card h-100 shadow-lg border-0">
+              <div
+                className="card h-100 shadow border-0"
+                style={{
+                  borderRadius: "12px",
+                  backgroundColor: "#f8f9fa",
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                }}
+              >
                 <div className="card-body">
-                  <h5 className="card-title text-primary">{order.buyer_name}</h5>
-                  <p>
+                  <h5 className="card-title text-dark">{order.buyer_name}</h5>
+                  <p className="text-muted">
                     <strong>Address:</strong> {order.address}
                   </p>
-                  <p>
+                  <p className="text-muted">
                     <strong>Phone:</strong> {order.phone}
                   </p>
-                  <p>
+                  <p className="text-muted">
                     <strong>Total:</strong> Rs {order.total}
                   </p>
                   <button
-                    className="btn btn-success w-100 mt-3"
+                    className="btn btn-primary w-100 mt-3"
                     onClick={() => handleMarkAsDispatched(order.id)}
+                    style={{
+                      backgroundColor: "#007bff",
+                      borderColor: "#007bff",
+                      color: "#fff",
+                    }}
                   >
                     <i className="bi bi-truck me-2"></i>Mark as Dispatched
                   </button>

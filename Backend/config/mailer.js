@@ -8,8 +8,8 @@ const transporter = nodemailer.createTransport({
     user: 'shanisipra428@gmail.com',
     pass: 'oaqf rwba qrkj isxb',
   },
-  logger: true,
-  debug: true,
+  // logger: true,
+  // debug: true,
 });
 
 
