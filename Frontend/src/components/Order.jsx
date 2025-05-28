@@ -1,10 +1,11 @@
 import React, { useRef } from "react";
-import { useLocation, Link } from "react-router-dom"; // Import Link for navigation
+import { useLocation, Link, useNavigate } from "react-router-dom"; // Import Link for navigation
 import CashOnDeliveryMessage from "./CashOnDeliveryMessage";
 
 const Order = () => {
   const { state: orderDetails } = useLocation(); // Retrieve orderDetails from state
   const printRef = useRef();
+  const navigate = useNavigate();
 
   // Handle missing orderDetails
   if (!orderDetails) {
@@ -70,14 +71,19 @@ const Order = () => {
       <CashOnDeliveryMessage />
       <div className="card p-4 shadow-lg rounded-4 border-0" ref={printRef}>
         <h3 className="text-primary mb-3">Order Details:</h3>
-        <p><strong>Order ID:</strong> {orderDetails.id}</p>
-        <p><strong>Name:</strong> {orderDetails.name}</p>
-        <p><strong>Phone:</strong> {orderDetails.phone}</p>
+        <p><strong>Order ID:</strong> {orderDetails.id || orderDetails.order_id || "N/A"}</p>
+        <p><strong>Name:</strong> {orderDetails.buyer_name || orderDetails.name || "N/A"}</p>
+        <p><strong>Phone:</strong> {orderDetails.contact || orderDetails.phone || "N/A"}</p>
         <p><strong>Address:</strong> {orderDetails.address}</p>
         <p><strong>Restaurant:</strong> {orderDetails.restaurantName}</p>
-        <p><strong>Date & Time:</strong> {new Date(orderDetails.createdAt).toLocaleString()}</p>
+        <p>
+          <strong>Date & Time:</strong>{" "}
+          {orderDetails.created_at
+            ? new Date(orderDetails.created_at).toLocaleString()
+            : new Date().toLocaleString()}
+        </p>
         <hr />
-        <h3 className="text-success">Total: Rs {orderDetails.total?.toFixed(2)}</h3>
+        <h3 className="text-success">Total: Rs {Number(orderDetails.total).toFixed(2)}</h3>
         <hr />
         <p className="text-center text-muted mt-3">
           <i className="bi bi-truck me-2"></i>

@@ -3,7 +3,7 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 
 // CREATE order
-router.post('/order', (req, res) => {
+router.post('/order', async (req, res) => {
   const { buyer_name, address, contact, total, status = 'Placed', restaurantName } = req.body;
 
   console.log('Received order:', { buyer_name, address, contact, total, status, restaurantName });
@@ -13,30 +13,25 @@ router.post('/order', (req, res) => {
     return res.status(400).json({ message: 'All fields are required.' });
   }
 
-  const createdAt = new Date(); // Get current timestamp
-
-  db.query(
-    'INSERT INTO orders (buyer_name, address, contact, total, status, restaurantName, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [buyer_name, address, contact, total, status, restaurantName, createdAt],
-    (err, result) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: 'Failed to place order.' });
-      }
-
-      // Send back the order details, including order ID, timestamp, and restaurant name
-      res.json({
-        message: 'Order placed successfully!',
-        id: result.insertId,
-        name: buyer_name,
-        phone: contact,
-        address,
-        total,
-        restaurantName,
-        createdAt,
-      });
-    }
-  );
+  try {
+    const db = require('../config/db');
+    const query = `
+      INSERT INTO orders (buyer_name, address, contact, total, status, restaurantName)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    await db.promise().query(query, [
+      buyer_name,
+      address,
+      contact,
+      total,
+      status,
+      restaurantName,
+    ]);
+    res.status(201).json({ message: 'Order created successfully.' });
+  } catch (err) {
+    console.error('Error creating order:', err);
+    res.status(500).json({ message: 'Failed to create order.' });
+  }
 });
 
 // READ orders for a restaurant (example: by buyer_email or all)
