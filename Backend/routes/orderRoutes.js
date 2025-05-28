@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
+const db = require('../config/db'); // Make sure you have this line if not already
 
 // CREATE order
 router.post('/order', async (req, res) => {
@@ -14,12 +15,11 @@ router.post('/order', async (req, res) => {
   }
 
   try {
-    const db = require('../config/db');
     const query = `
       INSERT INTO orders (buyer_name, address, contact, total, status, restaurantName)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-    await db.promise().query(query, [
+    const [result] = await db.promise().query(query, [
       buyer_name,
       address,
       contact,
@@ -27,7 +27,8 @@ router.post('/order', async (req, res) => {
       status,
       restaurantName,
     ]);
-    res.status(201).json({ message: 'Order created successfully.' });
+    // result.insertId contains the new order's ID
+    res.status(201).json({ message: 'Order created successfully.', order_id: result.insertId });
   } catch (err) {
     console.error('Error creating order:', err);
     res.status(500).json({ message: 'Failed to create order.' });

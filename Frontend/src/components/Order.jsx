@@ -1,13 +1,12 @@
 import React, { useRef } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom"; // Import Link for navigation
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import CashOnDeliveryMessage from "./CashOnDeliveryMessage";
 
 const Order = () => {
-  const { state: orderDetails } = useLocation(); // Retrieve orderDetails from state
+  const { state: orderDetails } = useLocation();
   const printRef = useRef();
   const navigate = useNavigate();
 
-  // Handle missing orderDetails
   if (!orderDetails) {
     return (
       <div className="container py-5">
@@ -18,6 +17,13 @@ const Order = () => {
       </div>
     );
   }
+
+  // Prefer id/order_id, fallback to status if not present
+  const orderId =
+    orderDetails.id ||
+    orderDetails.order_id ||
+    orderDetails.status ||
+    "N/A";
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -36,11 +42,11 @@ const Order = () => {
               margin-bottom: 20px;
             }
             .header img {
-              max-width: 100px;
+              max-width: 80px;
               margin-bottom: 10px;
             }
             .header h1 {
-              font-size: 24px;
+              font-size: 22px;
               margin: 0;
             }
             .content {
@@ -50,7 +56,7 @@ const Order = () => {
         </head>
         <body>
           <div class="header">
-            <img src="https://via.placeholder.com/100" alt="Website Logo" />
+            <img src="https://via.placeholder.com/80" alt="Website Logo" />
             <h1>Foodie Haven</h1>
           </div>
           <div class="content">
@@ -64,46 +70,65 @@ const Order = () => {
   };
 
   return (
-    <div className="container py-5">
-      <h2 className="text-center text-danger mb-4">
-        <i className="bi bi-check-circle-fill me-2 text-success"></i> Order Confirmation
+    <div className="container py-4">
+      <h2 className="text-center text-success mb-3" style={{ fontSize: "1.2rem" }}>
+        <i className="bi bi-check-circle-fill me-2 text-success"></i>Order Confirmed!
       </h2>
       <CashOnDeliveryMessage />
-      <div className="card p-4 shadow-lg rounded-4 border-0" ref={printRef}>
-        <h3 className="text-primary mb-3">Order Details:</h3>
-        <p><strong>Order ID:</strong> {orderDetails.id || orderDetails.order_id || "N/A"}</p>
-        <p><strong>Name:</strong> {orderDetails.buyer_name || orderDetails.name || "N/A"}</p>
-        <p><strong>Phone:</strong> {orderDetails.contact || orderDetails.phone || "N/A"}</p>
-        <p><strong>Address:</strong> {orderDetails.address}</p>
-        <p><strong>Restaurant:</strong> {orderDetails.restaurantName}</p>
-        <p>
-          <strong>Date & Time:</strong>{" "}
+      <div
+        className="card mx-auto p-3 shadow-sm rounded-4 border-0"
+        ref={printRef}
+        style={{
+          maxWidth: 320,
+          fontSize: "0.97rem",
+          background: "linear-gradient(135deg, #fffbe7 60%, #ffe0e0 100%)",
+        }}
+      >
+        <h5 className="text-primary mb-2" style={{ fontWeight: 700, fontSize: "1.08rem" }}>
+          Order Details
+        </h5>
+        <div className="mb-1">
+          <span className="fw-semibold">Order ID:</span> {orderId}
+        </div>
+        <div className="mb-1">
+          <span className="fw-semibold">Name:</span> {orderDetails.buyer_name || orderDetails.name || "N/A"}
+        </div>
+        <div className="mb-1">
+          <span className="fw-semibold">Phone:</span> {orderDetails.contact || orderDetails.phone || "N/A"}
+        </div>
+        <div className="mb-1">
+          <span className="fw-semibold">Address:</span> {orderDetails.address}
+        </div>
+        <div className="mb-1">
+          <span className="fw-semibold">Restaurant:</span> {orderDetails.restaurantName}
+        </div>
+        <div className="mb-1">
+          <span className="fw-semibold">Date & Time:</span>{" "}
           {orderDetails.created_at
             ? new Date(orderDetails.created_at).toLocaleString()
             : new Date().toLocaleString()}
-        </p>
-        <hr />
-        <h3 className="text-success">Total: Rs {Number(orderDetails.total).toFixed(2)}</h3>
-        <hr />
-        <p className="text-center text-muted mt-3">
-          <i className="bi bi-truck me-2"></i>
-          <strong>Your order will be delivered soon. Thank you for trusting us!</strong>
-        </p>
+        </div>
+        <hr className="my-2" />
+        <div className="mb-1 text-success" style={{ fontSize: "1.05rem", fontWeight: 600 }}>
+          Total: Rs {Number(orderDetails.total).toFixed(2)}
+        </div>
+        <div className="text-center text-muted mt-2" style={{ fontSize: "0.93rem" }}>
+          <i className="bi bi-truck me-1"></i>
+          Your order will be delivered soon!
+        </div>
       </div>
-      <div className="text-center mt-4">
-        <button className="btn btn-success btn-lg px-5" onClick={handlePrint}>
-          <i className="bi bi-printer me-2"></i>Print Bill
-        </button>
-      </div>
-      <p className="text-center text-muted mt-4">
-        <i className="bi bi-heart-fill me-2 text-danger"></i>
-        <strong>We hope you enjoyed ordering with us! Feel free to explore more delicious options.</strong>
-      </p>
       <div className="text-center mt-3">
-        <Link to="/" className="btn btn-primary btn-lg px-5">
-          <i className="bi bi-house-door me-2"></i>Craving more delicious food? Explore our menu and order again!
+        <button className="btn btn-outline-success btn-sm px-4 me-2" onClick={handlePrint}>
+          <i className="bi bi-printer me-1"></i>Print Bill
+        </button>
+        <Link to="/" className="btn btn-primary btn-sm px-4">
+          <i className="bi bi-house-door me-1"></i>Order Again
         </Link>
       </div>
+      <p className="text-center text-muted mt-3" style={{ fontSize: "0.93rem" }}>
+        <i className="bi bi-heart-fill me-1 text-danger"></i>
+        Thank you for choosing Foodie Haven!
+      </p>
     </div>
   );
 };
