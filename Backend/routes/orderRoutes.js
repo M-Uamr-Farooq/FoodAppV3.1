@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db');
 const orderController = require('../controllers/orderController');
 
 // CREATE order
@@ -82,5 +81,8 @@ router.delete('/orders/:id', (req, res) => {
 
 // Update order status
 router.patch('/orders/:id', orderController.updateOrderStatus);
+
+// Fetch new orders count
+router.get('/orders/:restaurantName/new-count', orderController.getNewOrdersCount);
 
 module.exports = router;

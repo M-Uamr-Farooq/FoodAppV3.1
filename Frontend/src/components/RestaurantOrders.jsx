@@ -82,6 +82,9 @@ const RestaurantOrders = () => {
                     <strong>Phone:</strong> {order.phone}
                   </p>
                   <p className="text-muted">
+                    <strong>Order Date:</strong> {new Date(order.created_at).toLocaleString()}
+                  </p>
+                  <p className="text-muted">
                     <strong>Total:</strong> Rs {order.total}
                   </p>
                   <button

@@ -37,7 +37,8 @@ exports.getOrdersByRestaurant = async (req, res) => {
 
   try {
     const query = `
-      SELECT * FROM orders
+      SELECT id, buyer_name, address, contact AS phone, total, status, created_at
+      FROM orders
       WHERE restaurantName = ?
       ORDER BY created_at DESC
     `;
@@ -71,5 +72,22 @@ exports.updateOrderStatus = async (req, res) => {
   } catch (err) {
     console.error('Error updating order status:', err);
     res.status(500).json({ message: 'Failed to update order status.' });
+  }
+};
+
+exports.getNewOrdersCount = async (req, res) => {
+  const { restaurantName } = req.params;
+  if (!restaurantName) return res.status(400).json({ message: 'Restaurant name is required.' });
+
+  try {
+    const query = `
+      SELECT COUNT(*) AS newOrdersCount
+      FROM orders
+      WHERE restaurantName = ? AND status = 'Placed'
+    `;
+    const [result] = await db.promise().query(query, [restaurantName]);
+    res.status(200).json(result[0]);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch new orders count.' });
   }
 };

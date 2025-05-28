@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../styles/Navbar.css"; // Make sure this file doesn't override Bootstrap navbar behavior
@@ -10,12 +11,33 @@ export default function Navbar() {
 
   const [isBuyer, setIsBuyer] = useState(false);
   const [isRestaurant, setIsRestaurant] = useState(false);
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
 
   useEffect(() => {
     const buyer = localStorage.getItem("buyer");
     const restaurant = sessionStorage.getItem("restaurant");
     setIsBuyer(!!buyer);
     setIsRestaurant(!!restaurant);
+
+    // Only fetch new orders count if restaurant is logged in
+    if (restaurant) {
+      const { name } = JSON.parse(restaurant);
+
+      const fetchNewOrdersCount = async () => {
+        try {
+          const res = await axios.get(
+            `http://localhost:3000/api/orders/${encodeURIComponent(name)}/new-count`
+          );
+          setNewOrdersCount(res.data.newOrdersCount || 0);
+        } catch (err) {
+          setNewOrdersCount(0);
+        }
+      };
+
+      fetchNewOrdersCount();
+      const interval = setInterval(fetchNewOrdersCount, 30000);
+      return () => clearInterval(interval);
+    }
   }, []);
 
   const handleSignOut = () => {
@@ -115,10 +137,23 @@ export default function Navbar() {
                     <i className="bi bi-house-door me-1"></i> Home
                   </Link>
                 </li>
-                
                 <li className="nav-item">
-                  <Link className="nav-link" to="/restaurant-orders" style={linkStyle}>
+                  <Link className="nav-link position-relative" to="/restaurant-orders" style={linkStyle}>
                     <i className="bi bi-list-check me-1"></i> Orders
+                    {newOrdersCount > 0 && (
+                      <span
+                        className="badge bg-danger position-absolute"
+                        style={{
+                          top: "0.2rem",
+                          right: "-1.2rem",
+                          fontSize: "0.75rem",
+                          padding: "0.3em 0.6em",
+                          borderRadius: "1em",
+                        }}
+                      >
+                        {newOrdersCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
                 <li className="nav-item">
